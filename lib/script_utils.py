@@ -4,6 +4,8 @@ import subprocess
 import sys
 import venv
 
+from lib.term_colour import notify, status_ok
+
 
 @contextlib.contextmanager
 def activate_virtualenv(env_dir):
@@ -18,16 +20,22 @@ def activate_virtualenv(env_dir):
 
 
 def create_virtualenv(env_dir):
-    return venv.create(env_dir, with_pip=True)
+    notify('\nCreating virtualenv')
+    res = venv.create(env_dir, with_pip=True)
+    if not res:
+        status_ok('Done')
+    return res
 
 
 def install_requirements(env_dir):
+    notify('\nInstalling requirements')
     env = os.environ.copy()
     proc = subprocess.run(
         ['pip', 'install', '-r', 'requirements.txt'],
         env=env)
     if proc.returncode:
         sys.exit(proc.returncode)
+    status_ok('Done')
 
 
 def run_in_virtualenv(argv, env_dir='venv'):

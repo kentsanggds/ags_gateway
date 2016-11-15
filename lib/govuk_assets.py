@@ -12,6 +12,8 @@ from tempfile import TemporaryDirectory
 from urllib.request import urlretrieve
 import zipfile
 
+from lib.term_colour import notify, status_ok
+
 
 @contextlib.contextmanager
 def pushd(path):
@@ -47,7 +49,12 @@ class GovUkFrontendToolkit(object):
     def clean(self):
         rmdir(self.dest_dir)
 
+    def is_installed(self):
+        return os.path.isdir(self.dest_dir)
+
     def build(self, unzip_dir):
+        self.clean()
+
         for path in ['images', 'javascripts', 'stylesheets']:
             move_dir(
                 '{}/govuk_frontend_toolkit-master/{}'.format(unzip_dir, path),
@@ -64,7 +71,12 @@ class GovUkElements(object):
     def clean(self):
         rmdir(self.dest_dir)
 
+    def is_installed(self):
+        return os.path.isdir(self.dest_dir)
+
     def build(self, unzip_dir):
+        self.clean()
+
         move_dir(
             '{}/govuk_elements-master/public'.format(unzip_dir),
             to=self.dest_dir)
@@ -82,6 +94,11 @@ class GovUkTemplate(object):
         rmdir(self.dest_views)
         rmdir(self.dest_assets)
 
+    def is_installed(self):
+        return (
+            os.path.isdir(self.dest_views) and
+            os.path.isdir(self.dest_assets))
+
     def build(self, unzip_dir):
         master_dir = '{}/govuk_template-master'.format(unzip_dir)
 
@@ -92,6 +109,8 @@ class GovUkTemplate(object):
             subprocess.call(['bundle', 'install'])
             subprocess.call(['bundle', 'exec', 'rake', 'build:jinja'])
 
+        self.clean()
+
         move_dir(
             '{}/pkg/jinja_govuk_template*/assets'.format(master_dir),
             to=self.dest_assets)
@@ -101,7 +120,7 @@ class GovUkTemplate(object):
             to=self.dest_views)
 
 
-def install_govuk_assets(app_dir, clean):
+def install_govuk_assets(app_dir, clean=False):
     """
     Download and install the govuk assets
     """
@@ -124,6 +143,11 @@ def install(package_name, package, clean=False):
     if clean:
         package.clean()
 
+    if package.is_installed():
+        return
+
+    notify('\nInstalling GOV.UK {}'.format(package_name))
+
     with TemporaryDirectory() as download_dir:
         dest_zip = '{}/{}.zip'.format(download_dir, package_name)
         unzip_dir = '{}/unzipped'.format(download_dir)
@@ -134,3 +158,5 @@ def install(package_name, package, clean=False):
             zf.extractall(unzip_dir)
 
         package.build(unzip_dir)
+
+    status_ok('Done')

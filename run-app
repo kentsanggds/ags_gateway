@@ -2,7 +2,9 @@
 
 import argparse
 
+from lib.govuk_assets import install_govuk_assets
 from lib.script_utils import virtualenv, environment
+from lib.term_colour import notify
 
 
 def main():
@@ -23,11 +25,18 @@ def get_args():
 def run_app(host, port):
     from app.factory import create_app
     app = create_app()
+
+    import os
+    if 'WERKZEUG_RUN_MAIN' not in os.environ:
+        notify('\nRunning web app')
+
     return app.run(host=host, port=port)
 
 
 if __name__ == '__main__':
     import sys
+
+    install_govuk_assets('app')
 
     with environment(), virtualenv():
         sys.exit(main())
