@@ -1,0 +1,9 @@
+flask
+pytest
+pytest-watch
+pytest_eradicate
+pytest_flake8
+pytest_spec
+mock
+flask_assets
+libsass

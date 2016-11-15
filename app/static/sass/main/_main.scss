@@ -1,0 +1,116 @@
+$gutter-third: $gutter / 3;
+
+.sign-out-container {
+  position: relative;
+  text-align: right;
+  margin-top: 10px;
+  border-top: 1px solid $border-colour;
+  border-bottom: 1px solid $border-colour;
+  padding: $gutter-half 0 $gutter-third;
+  .user-name {
+    margin: 0;
+  }
+  span,
+  .user-auth-status {
+    display: inline-block;
+    font-size: 16px;
+    color: $secondary-text-colour;
+    -webkit-transition: all 0.5s ease-in;
+    transition: all 0.5s ease-in;
+  }
+  .user-auth-status--warning,
+  .user-auth-status--reauth {
+    padding-right: 10px;
+  }
+  .user-auth-status--warning {
+    border-right: 5px solid $yellow;
+
+    .auth-msg--warning {
+      display: block;
+    }
+  }
+  .user-auth-status--reauth {
+    border-right: 5px solid $red;
+
+    .auth-msg--reauth {
+      display: block;
+    }
+  }
+  .admin-user {
+    position: absolute;
+    left: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 48px;
+    color: $grey-2;
+    line-height: 71px;
+  }
+  .auth-msg {
+    display: none;
+  }
+}
+
+.user-details {
+  margin: 20px 0px;
+}
+
+.user-details h1 {
+  margin-top: 0;
+}
+
+.user-details p {
+  margin-bottom: 10px;
+}
+
+.user-name {
+  margin-right: 10px;
+}
+
+nav.admin {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.secondary.button {
+  background: $grey-3;
+  color: $black;
+  box-shadow: 0 2px 0 $grey-2;
+}
+
+.column-full {
+  padding: 0 15px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.suits {
+  width: 100%;
+  margin: 0 0 1em;
+
+  form {
+    display: inline-block;
+    margin: 0 5px;
+  }
+
+  .accepted {
+    display: inline-block;
+    line-height: 1.25;
+    position: relative;
+    top: 7px;
+    margin: 0 5px;
+  }
+
+}
+
+.success-summary {
+  @extend .error-summary;
+  border-color: $button-colour;
+}
+
+.flush--top {
+  margin-top: 0;
+}
+
+
