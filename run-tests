@@ -25,7 +25,7 @@ def get_args():
 
 def run_tests(suite, watch=False):
     args = build_args(suite)
-    test_runner = run_on_updates() if watch else run_once
+    test_runner = run_on_updates() if watch else run_once()
     return test_runner(args)
 
 
