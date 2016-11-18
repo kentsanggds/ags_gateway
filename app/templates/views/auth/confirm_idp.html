@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+  <a href="/" class="link-back">Back</a>
+
+  <h1 class="heading-medium">
+    We think you are from HMRC. Is that correct?
+  </h1>
+
+  <form method="post">{{form.csrf_token}}
+    <div class="form-group">
+      <fieldset>
+
+        <legend class="visuallyhidden">We think you are from HMRC. Is that correct?</legend>
+
+        <div class="form-group">
+          <details class="text" role="group">
+            <summary role="button" aria-controls="details-content-0" aria-expanded="true"><span class="summary">Why do we think that?</span></summary>
+            <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="false">
+              <p>
+                If you’re not from this department it might be useful to understand why we thought you were.
+              </p>
+              <p>
+                We have the following info about you so...
+              </p>
+            </div>
+          </details>
+        </div>
+
+        {% with subfields=form.confirm|list %}
+        <label class="block-label selection-button-radio" for="{{subfields[0].id}}">
+          {{subfields[0]}}
+          {{subfields[0].label}}
+        </label>
+
+        <label class="block-label selection-button-radio" for="{{subfields[1].id}}">
+          {{subfields[1]}}
+          {{subfields[1].label}}
+        </label>
+        {% endwith %}
+
+      </fieldset>
+    </div>
+    <div class="form-group">
+      <button class="button">Confirm</button>
+    </div>
+  </form>
+
+{% endblock %}

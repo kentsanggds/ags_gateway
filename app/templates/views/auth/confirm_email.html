@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+  <h1 class="heading-medium">Do you know your work email?</h1>
+
+  <form method="post" class="form">{{ form.csrf_token }}
+    <div class="form-group">
+      <fieldset>
+        <legend class="visuallyhidden">Do you know your work email?</legend>
+
+        {% with subfields=form.email_known|list %}
+        <label class="block-label selection-button-radio selected" for="{{subfields[0].id}}">
+          {{subfields[0](aria_controls="know-email", aria_expanded="true", checked="checked")}}
+          {{subfields[0].label}}
+        </label>
+        <div class="panel panel-border-narrow{% if form.email_address.errors %} error{% endif %}" id="know-email" aria-hidden="false">
+          <label class="form-label-bold" for="{{form.email_address.id}}">
+            {{form.email_address.label}}
+            <span class="form-hint"></span>
+            {% for error in form.email_address.errors %}
+            <span class="error-message">{{error}}</span>
+            {% endfor %}
+          </label>
+          {{form.email_address(class_="form-control")}}
+        </div>
+
+        <label class="block-label selection-button-radio" for="{{subfields[1].id}}">
+          {{subfields[1](aria_controls="know-email", aria_expanded="false")}}
+          {{subfields[1].label}}
+        </label>
+        {% endwith %}
+      </fieldset>
+    </div>
+
+    <div class="form-group">
+      <button class="button">Confirm</button>
+    </div>
+  </form>
+
+{% endblock %}

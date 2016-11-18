@@ -6,4 +6,5 @@ main = Blueprint('main', __name__)  # noqa
 
 from app.main.views import (
     index,
+    auth,
 )

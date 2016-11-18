@@ -7,3 +7,4 @@ pytest_spec
 mock
 flask_assets
 libsass
+flask_wtf

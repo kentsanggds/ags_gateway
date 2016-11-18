@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+  <h1 class="heading-xlarge">Select IDP</h1>
+
+  <form class="form">
+    <label for="" class="form-label">Search for your department, ALB or agency</label>
+    <div class="main-search idp-search">
+      <input type="text" class="search__input" id="person-search" placeholder="enter department name here" />
+      <input class="search__submit" type="submit" value="Search" />
+    </div>
+  </form>
+
+  <div class="search-tabs">
+    <ul>
+      <li><a href="#all">All</a></li>
+      <li class="active"><a href="#departments">Departments</a></li>
+      <li><a href="#agencies">Agencies</a></li>
+    </ul>
+  </div>
+
+{% endblock %}
