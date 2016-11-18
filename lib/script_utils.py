@@ -1,28 +1,59 @@
 import contextlib
 import os
+import pkg_resources
 import subprocess
 import sys
 import venv
 
-from lib.term_colour import notify, status_ok
+from lib.term_colour import notify, status_ok, status_err
 
 
 @contextlib.contextmanager
 def activate_virtualenv(env_dir):
-    os.environ['VIRTUAL_ENV'] = os.path.abspath(env_dir)
-    os.environ['PATH'] = '{VIRTUAL_ENV}/bin:{PATH}'.format(**os.environ)
+    abs_env_dir = os.path.abspath(env_dir)
 
-    if not os.path.isdir(os.environ['VIRTUAL_ENV']):
-        create_virtualenv(env_dir)
-        install_requirements(env_dir)
+    os.environ['VIRTUAL_ENV'] = abs_env_dir
+    os.environ['PATH'] = '{VIRTUAL_ENV}{sep}bin{pathsep}{PATH}'.format(
+        sep=os.sep, pathsep=os.pathsep, **os.environ)
+
+    if not os.path.isdir(abs_env_dir):
+        create_virtualenv(abs_env_dir)
+
+    if sys.platform == 'win32':
+        site_packages = os.path.join(abs_env_dir, 'Lib', 'site-packages')
+    else:
+        site_packages = os.path.join(abs_env_dir, 'lib', 'python{}'.format(
+            sys.version[:3]), 'site-packages')
+
+    old_sys_path = list(sys.path)
+
+    import site
+    site.addsitedir(site_packages)
+
+    sys.real_prefix = sys.prefix
+    sys.prefix = abs_env_dir
+
+    new_sys_path = []
+    for item in list(sys.path):
+        if item not in old_sys_path:
+            new_sys_path.append(item)
+            sys.path.remove(item)
+    sys.path[:0] = new_sys_path
+
+    check_requirements(env_dir)
 
     yield
 
 
 def create_virtualenv(env_dir):
     notify('\nCreating virtualenv')
-    res = venv.create(env_dir, with_pip=True)
+    res = venv.create(env_dir, system_site_packages=False, with_pip=True)
     if not res:
+        proc = subprocess.run(
+            ['pip', 'install', '--upgrade', 'pip'],
+            env=os.environ.copy())
+        if proc.returncode:
+            sys.exit(proc.returncode)
         status_ok('Done')
     return res
 
@@ -36,6 +67,35 @@ def install_requirements(env_dir):
     if proc.returncode:
         sys.exit(proc.returncode)
     status_ok('Done')
+
+
+def check_requirements(env_dir):
+    notify('\nChecking requirements')
+
+    with open('requirements.txt', 'r') as req_file:
+        dependencies = req_file.readlines()
+
+    workingset = pkg_resources.WorkingSet(sys.path)
+
+    fail = False
+    for dep in dependencies:
+        try:
+            workingset.require(dep)
+
+        except Exception as e:
+            status_err(str(e))
+
+            proc = subprocess.run(
+                ['pip', 'install', dep],
+                env=os.environ.copy())
+
+            if proc.returncode:
+                sys.exit(proc.returncode)
+
+    if not fail:
+        status_ok('OK')
+
+    return not fail
 
 
 def run_in_virtualenv(argv, env_dir='venv'):
