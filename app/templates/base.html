@@ -1,8 +1,31 @@
+{#
+govuk_template.html defines the following blocks:
+
+- top_of_page
+- page_title
+- head
+- body_classes
+- body_start
+- cookie_message
+- header_class
+- inside_header
+- proposition_header
+- after_header
+- content
+- footer_top
+- footer_support_links
+- body_end
+
+See https://github.com/alphagov/govuk_template for more
+information regarding the template.
+
+#}
+
 {% extends "govuk_template/views/layouts/govuk_template.html" %}
 
 {% block head %}
 
-  {% assets "css_main" %}
+  {% assets "css_govuk", "css_main" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}">
   {% endassets %}
 
@@ -12,37 +35,32 @@
 
 {% endblock %}
 
-{% block body_classes %}full-width{% endblock %}
-
 {% block header_class %}with-proposition{% endblock %}
-
 {% block proposition_header %}
 <div class='header-proposition'>
   <div class='content'>
     <nav id='proposition-menu'>
-      <a href='/' id='proposition-name'>Identity Gateway</a>
+      <a href='/' id='proposition-name'>Choose how to log in</a>
     </nav>
   </div>
 </div>
 {% endblock %}
 
 {% block content %}
-  <div class="full-width-container">
-    {% block top_banner %}
-    <div class="grid-row">
+  <main id="content" role="main">
+    <div class="phase-banner-alpha">
+      <p>
+        <strong class="phase-tag">ALPHA</strong>
+        <span>You can help us improve this app by getting in touch and providing feedback.</span>
+      </p>
     </div>
-    {% endblock %}
-  </div>
-
-  <main id="wrapper" role="main">
-    <div id="content">
-
-      {# include "partial/_messages.html" #}
-
-      {# include "partial/login_state.html" #}
-
-      {% block body_content %}{% endblock %}
-
-    </div>
+    {% block main_content %}{% endblock %}
   </main>
+{% endblock %}
+
+{% block body_end %}
+
+  {# js scripts here #}
+  {% include 'includes/scripts.html' %}
+
 {% endblock %}

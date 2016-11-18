@@ -21,10 +21,10 @@ libsass_output = LibSass(include_paths=[
 
 env = Environment()
 
-env.register('css_govuk_elements', Bundle(
-    'sass/govuk_elements.scss',
+env.register('css_govuk', Bundle(
+    'sass/govuk.scss',
     filters=(libsass_output,),
-    output='stylesheets/govuk_elements.css',
+    output='gen/css/govuk_elements.css',
     depends=[
         '/static/govuk_elements/public/sass/**/*.scss',
         '/static/govuk_frontend_toolkit/stylesheets/**/*.scss']))
@@ -32,7 +32,6 @@ env.register('css_govuk_elements', Bundle(
 env.register('css_main', Bundle(
     'sass/main.scss',
     filters=(libsass_output,),
-    output='stylesheets/main.css',
+    output='gen/css/main.css',
     depends=[
-        '/static/sass/main/**/*.scss',
-        '/static/govuk_frontend_toolkit/stylesheets/**/*.scss']))
+        '/static/sass/main/**/*.scss']))
