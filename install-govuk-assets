@@ -2,13 +2,17 @@
 
 import argparse
 
-from lib.govuk_assets import install_govuk_assets
-from lib.script_utils import virtualenv
+from lib.govuk_assets import install_govuk_assets, remove_govuk_assets
+from lib.term_colour import notify, status_ok
 
 
 def main():
     args = get_args()
-    return install_govuk_assets(args.app_dir, args.clean)
+
+    if args.clean:
+        remove_govuk_assets(args.app_dir)
+
+    install_govuk_assets(args.app_dir, logger=log)
 
 
 def get_args():
@@ -21,8 +25,13 @@ def get_args():
     return parser.parse_args()
 
 
+def log(msg):
+    if msg == 'Done':
+        status_ok(msg)
+    else:
+        notify('\n' + msg)
+
+
 if __name__ == '__main__':
     import sys
-
-    with virtualenv():
-        sys.exit(main())
+    sys.exit(main())
