@@ -8,3 +8,4 @@ mock
 flask_assets
 libsass
 flask_wtf
+pyop

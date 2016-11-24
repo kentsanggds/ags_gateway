@@ -12,26 +12,14 @@ APP_NAME = env.get('APP_NAME', 'ags_gateway')
 
 DEBUG = bool(env.get('DEBUG', True))
 
-OIDC_PROVIDERS = {
-    'dex': {
-        'discovery_url': env.get('OIDC_ISSUER'),
-        'client_id': env.get('OIDC_CLIENT_ID'),
-        'client_secret': env.get('OIDC_CLIENT_SECRET'),
-        'redirect_uri': None
-    },
-    # 'azure_ad': {
-    #     'discovery_url': env.get('OIDC_ISSUER_1'),
-    #     'client_id': env.get('OIDC_CLIENT_ID_1'),
-    #     'client_secret': env.get('OIDC_CLIENT_SECRET_1'),
-    #     'redirect_uri': None
-    # },
-    # 'google': {
-    #     'discovery_url': env.get('OIDC_ISSUER_2'),
-    #     'client_id': env.get('OIDC_CLIENT_ID_2'),
-    #     'client_secret': env.get('OIDC_CLIENT_SECRET_2'),
-    #     'redirect_uri': None
-    # }
+SERVER_NAME = env.get('SERVER_NAME', 'localhost:5000')
+
+OIDC_PROVIDER = {
+    'issuer': env.get(
+        'OIDC_PROVIDER_ISSUER', 'https://{}'.format(SERVER_NAME)),
+    'subject_id_hash_salt': env.get('SUBJECT_ID_HASH_SALT', 'salt'),
 }
+
 
 # XXX This should be True when served over HTTPS
 OIDC_COOKIE_SECURE = False

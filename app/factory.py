@@ -26,6 +26,9 @@ def register_blueprints(app):
     from app.main import main
     app.register_blueprint(main)
 
+    from app.oidc_provider import oidc_provider
+    app.register_blueprint(oidc_provider)
+
 
 def register_context_processors(app):
 
@@ -62,3 +65,6 @@ def register_extensions(app):
 
     from app.assets import env
     env.init_app(app)
+
+    from app.oidc_provider import init_oidc_provider
+    app.provider = init_oidc_provider(app)

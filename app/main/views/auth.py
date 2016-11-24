@@ -11,7 +11,6 @@ from app.main.forms import (
     EmailForm,
     IdpConfirmForm,
     IdpSelectForm)
-from app.oidc import AuthenticationRequest, AuthenticationRequestError
 
 
 IDP_OF_LAST_RESORT = 'idp of last resort'
@@ -50,22 +49,13 @@ def authentication_request():
     if 'email_address' in session:
         del session['email_address']
 
-    try:
-        auth_req = AuthenticationRequest(request)
-
-    except AuthenticationRequestError as err:
-        return err
-
-    # TODO - OIDC spec 3.1.2.2 item 4
-
-    # session['auth_req'] = auth_req
     session['auth_req'] = request.args
 
-    if auth_req.specific_idp:
-        return redirect_to_broker(auth_req.specific_idp)
+    if 'specific_idp' in request.args:
+        return redirect_to_broker(request.args['specific_idp'])
 
-    elif auth_req.suggested_idp:
-        session['suggested_idp'] = auth_req.suggested_idp
+    elif 'suggested_idp' in request.args:
+        session['suggested_idp'] = request.args['suggested_idp']
         return redirect(url_for('.confirm_idp'))
 
     return redirect(url_for('.request_email_address'))

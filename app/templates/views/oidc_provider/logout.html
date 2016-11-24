@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+  <h1 class="heading-medium">Do you really want to log out?</h1>
+
+  <form method="post" class="form">
+    <div class="form-group">
+      <button class="button" name="logout" value="yes">Yes, log out</button>
+      <button class="button" name="no_logout" value="no">No, cancel</button>
+    </div>
+  </form>
+
+{% endblock %}
