@@ -4,7 +4,7 @@ import argparse
 
 from lib.govuk_assets import install_govuk_assets
 from lib.script_utils import virtualenv, environment
-from lib.term_colour import notify
+from lib.term_colour import notify, status_ok
 
 
 def main():
@@ -38,5 +38,9 @@ if __name__ == '__main__':
 
     install_govuk_assets('app')
 
-    with environment(), virtualenv():
-        sys.exit(main())
+    try:
+        with environment(), virtualenv():
+            sys.exit(main())
+
+    except KeyboardInterrupt:
+        status_ok('\nDone')
