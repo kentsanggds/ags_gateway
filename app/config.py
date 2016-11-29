@@ -14,6 +14,12 @@ DEBUG = bool(env.get('DEBUG', True))
 
 SERVER_NAME = env.get('SERVER_NAME', 'localhost:5000')
 
+OIDC_CLIENT = {
+    'issuer': env.get('OIDC_CLIENT_ISSUER'),
+    'client_id': env.get('OIDC_CLIENT_ID'),
+    'client_secret': env.get('OIDC_CLIENT_SECRET'),
+}
+
 OIDC_PROVIDER = {
     'issuer': env.get(
         'OIDC_PROVIDER_ISSUER', 'https://{}'.format(SERVER_NAME)),

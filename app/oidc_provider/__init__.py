@@ -37,9 +37,10 @@ def init_oidc_provider(app):
     authz_state = AuthorizationState(HashBasedSubjectIdentifierFactory(
         app.config['OIDC_PROVIDER']['subject_id_hash_salt']))
     clients = {
-        'test-client': {
+        'notify-test': {
+            'client_name': 'GOV.UK Notify',
             'redirect_uris': [
-                'http://localhost:5000/oidc_callback',
+                'http://localhost:6012/oidc_callback',
             ],
             'response_types': [
                 'code',

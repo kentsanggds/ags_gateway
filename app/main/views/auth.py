@@ -16,17 +16,23 @@ from app.main.forms import (
 IDP_OF_LAST_RESORT = 'idp of last resort'
 
 idp_names = {
-    'google': 'Government Digital Service',
+    'gds-google': 'Government Digital Service',
     'dex': 'Cabinet Office',
-    'keycloak': 'Ministry of Justice',
+    'ad-saml': 'Azure AD SAML2',
 }
 
 
 def redirect_to_broker(idp):
-    return 'redirect_to_broker({})'.format(idp)
+    session['idp_hint'] = idp
+    return redirect(url_for('broker.auth', idp_hint=idp))
 
 
 def idp_from_email_address(email_address):
+    client_id = session['auth_request']['client_id']
+
+    if client_id == 'notify-test':
+        return ['gds-google', 'ad-saml']
+
     idp = session['auth_req'].get('email_idp', '')
     if ',' in idp:
         idp = idp.split(',')
