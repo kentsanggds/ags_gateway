@@ -1,0 +1,5 @@
+---
+applications:
+- name: ags_gateway
+  memory: 64M
+  buildpack: python_buildpack
