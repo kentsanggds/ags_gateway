@@ -39,6 +39,7 @@ def init_oidc_provider(app):
     clients = {
         'notify-test': {
             'client_name': 'GOV.UK Notify',
+            'client_secret': 'notify-secret',
             'redirect_uris': [
                 'http://localhost:6012/oidc_callback',
             ],

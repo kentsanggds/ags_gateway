@@ -26,6 +26,7 @@ OIDC_PROVIDER = {
     'subject_id_hash_salt': env.get('SUBJECT_ID_HASH_SALT', 'salt'),
 }
 
+PREFERRED_URL_SCHEME = 'https'
 
 # XXX This should be True when served over HTTPS
 OIDC_COOKIE_SECURE = False

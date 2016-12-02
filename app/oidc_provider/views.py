@@ -12,6 +12,7 @@ from flask import (
     url_for,
 )
 from oic.oic.message import (
+    AuthorizationRequest,
     EndSessionRequest,
     TokenErrorResponse,
     UserInfoErrorResponse,
@@ -38,9 +39,9 @@ def register():
         client_metadata = register_client()
 
     except InvalidClientRegistrationRequest as error:
-        return make_response(jsonify(error.to_dict()), status=400)
+        return make_response((jsonify(error.to_dict()), 400))
 
-    return make_response(jsonify(client_metadata), status=201)
+    return make_response((jsonify(client_metadata), 201))
 
 
 def register_client():
@@ -72,7 +73,7 @@ def parse_auth_request():
 
 
 def authorize(user):
-    auth_request = session['auth_request']
+    auth_request = AuthorizationRequest(**session['auth_request'])
     auth_response = current_app.provider.authorize(auth_request, user)
     return auth_response.request(
         auth_request['redirect_uri'],
@@ -99,6 +100,9 @@ def token():
 
 
 def access_token():
+    current_app.logger.debug(
+        'TOKEN REQUEST:\n{}{}'.format(request.headers, request.get_data()))
+
     return current_app.provider.handle_token_request(
         request.get_data().decode('utf-8'),
         request.headers
@@ -110,10 +114,10 @@ def token_error(exception):
     error_response = TokenErrorResponse(
         error=exception.oauth_error, error_description=str(exception))
 
-    response = make_response(jsonify(error_response.to_dict()), status=400)
+    response = make_response((jsonify(error_response.to_dict()), 400))
 
     if isinstance(exception, InvalidClientAuthentication):
-        response.status = 401
+        response.status = '401'
         response.headers['WWW-Authenticate'] = 'basic'
 
     return response
@@ -139,7 +143,7 @@ def userinfo_error(exception):
     error_response = UserInfoErrorResponse(
         error='invalid_token', error_description=str(exception))
 
-    response = make_response(jsonify(error_response.to_dict()), status=401)
+    response = make_response((jsonify(error_response.to_dict()), 401))
     response.headers['WWW-Authenticate'] = AccessToken.BEARER_TOKEN_TYPE
 
     return response

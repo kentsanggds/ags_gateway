@@ -30,7 +30,8 @@ def run_app(host, port):
     if 'WERKZEUG_RUN_MAIN' not in os.environ:
         notify('\nRunning web app')
 
-    return app.run(host=host, port=port)
+    return app.run(
+        host=host, port=port, ssl_context=('server.crt', 'server.key'))
 
 
 if __name__ == '__main__':

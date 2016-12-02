@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, current_app
 from oic.oic import Client
 from oic.oic.message import RegistrationRequest
 from oic.utils.authn.client import CLIENT_AUTHN_METHOD
@@ -37,4 +37,6 @@ class OIDCClient(object):
         app.add_url_rule('/oidc_callback', 'oidc_callback', views.callback)
 
         with app.app_context():
-            return url_for('oidc_callback')
+            url = url_for('oidc_callback', _external=True)
+            current_app.logger.debug('REDIRECT_URI', url)
+            return url
