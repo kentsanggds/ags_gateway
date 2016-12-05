@@ -38,5 +38,5 @@ class OIDCClient(object):
 
         with app.app_context():
             url = url_for('oidc_callback', _external=True)
-            current_app.logger.debug('REDIRECT_URI', url)
+            current_app.logger.debug('REDIRECT_URI: %s', url)
             return url
