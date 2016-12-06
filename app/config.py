@@ -12,7 +12,8 @@ APP_NAME = env.get('APP_NAME', 'ags_gateway')
 
 DEBUG = bool(env.get('DEBUG', True))
 
-SERVER_NAME = env.get('SERVER_NAME', 'localhost:5000')
+SERVER_NAME = env.get(
+    'SERVER_NAME', 'localhost:{}'.format(env.get('PORT', 5000)))
 
 OIDC_CLIENT = {
     'issuer': env.get('OIDC_CLIENT_ISSUER'),

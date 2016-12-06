@@ -103,10 +103,14 @@ def access_token():
     current_app.logger.debug(
         'TOKEN REQUEST:\n{}{}'.format(request.headers, request.get_data()))
 
-    return current_app.provider.handle_token_request(
+    token = current_app.provider.handle_token_request(
         request.get_data().decode('utf-8'),
         request.headers
     ).to_dict()
+
+    current_app.logger.debug('TOKEN RESPONSE:\n{}'.format(token))
+
+    return token
 
 
 def token_error(exception):
