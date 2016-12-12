@@ -72,9 +72,19 @@ def parse_auth_request():
         urlencode(request.args), request.headers)
 
 
-def authorize(user):
+def authorize():
+    id_token = session['id_token']
+    extra_claims = {}
+    for claim, value in id_token.items():
+        if claim not in [
+                'iss', 'sub', 'aud', 'exp', 'iat', 'auth_time', 'nonce', 'acr',
+                'amr', 'azp', 'at_hash', 'c_hash', 'typ']:
+            extra_claims[claim] = value
     auth_request = AuthorizationRequest(**session['auth_request'])
-    auth_response = current_app.provider.authorize(auth_request, user)
+    auth_response = current_app.provider.authorize(
+        auth_request,
+        id_token['sub'],
+        extra_id_token_claims=extra_claims)
     return auth_response.request(
         auth_request['redirect_uri'],
         should_fragment_encode(auth_request))
@@ -100,15 +110,10 @@ def token():
 
 
 def access_token():
-    current_app.logger.debug(
-        'TOKEN REQUEST:\n{}{}'.format(request.headers, request.get_data()))
-
     token = current_app.provider.handle_token_request(
         request.get_data().decode('utf-8'),
         request.headers
     ).to_dict()
-
-    current_app.logger.debug('TOKEN RESPONSE:\n{}'.format(token))
 
     return token
 
@@ -137,10 +142,14 @@ def userinfo():
 
 
 def userinfo_data():
-    return current_app.provider.handle_userinfo_request(
+    current_app.logger.info('Requesting userinfo')
+
+    data = current_app.provider.handle_userinfo_request(
         request.get_data().decode('utf-8'),
         request.headers
     ).to_dict()
+
+    return data
 
 
 def userinfo_error(exception):
