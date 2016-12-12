@@ -23,9 +23,7 @@ def callback():
     })
 
     if userinfo:
-        session['userinfo'] = userinfo.to_dict()
-
-    current_app.provider.userinfo[id_token['sub']] = userinfo.to_dict()
+        current_app.provider.userinfo[id_token['sub']] = userinfo.to_dict()
 
     current_app.logger.info('Redirecting to {destination}'.format(
         destination=session.get('destination')))

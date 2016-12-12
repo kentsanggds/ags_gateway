@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from urllib.parse import urlencode
+from urllib.parse import unquote, urlencode
 
 from flask import (
     current_app,
@@ -172,7 +172,7 @@ def logout():
 
         return make_response('You chose not to logout')
 
-    session['end_session_request'] = urlencode(request.args)
+    session['end_session_request'] = request.args
 
     return render_template('views/oidc_provider/logout.html')
 
@@ -186,14 +186,20 @@ def do_logout():
         raise BadRequest('Logout unsuccessful')
 
     if redirect_url:
-        return redirect(redirect_url, 303)
+        return redirect(redirect_url)
+
+    if 'post_logout_redirect_uri' in request.args:
+        return redirect(unquote(request.args['post_logout_redirect_uri']))
 
     return make_response('Logout successful')
 
 
 def logout_user():
-    request = EndSessionRequest().deserialize(session['end_session_request'])
+    params = session['end_session_request']
+    params.update({'id_token_hint': session['id_token_jwt']})
 
-    current_app.provider.logout_user(request)
+    request = EndSessionRequest().deserialize(urlencode(params))
+
+    current_app.provider.logout_user(end_session_request=request)
 
     return current_app.provider.do_post_logout_redirect(request)
