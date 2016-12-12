@@ -47,5 +47,32 @@ ASSETS_LOAD_PATH = [
     'app/static',
     'app/templates']
 
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'default': {
+            'format': '%(name)s [%(levelname)s] %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+            'level': 'DEBUG'
+        }
+    },
+    'loggers': {
+        'app.factory': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
+        'werkzeug': {
+            'propagate': False
+        },
+    },
+}
+
+
 # TODO this should be True when served via HTTPS
 SESSION_COOKIE_SECURE = False

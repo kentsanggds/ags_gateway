@@ -1,13 +1,15 @@
-class Userinfo(object):
-
-    def __init__(self):
-        pass
-
-    def __getitem__(self, item):
-        return {}
-
-    def __contains__(self, item):
-        return True
+class Userinfo(dict):
 
     def get_claims_for(self, user_id, requested_claims):
-        return {}
+
+        claims = {}
+        userinfo = self.get(user_id)
+
+        if userinfo:
+
+            for claim, spec in requested_claims.items():
+
+                if claim in userinfo:
+                    claims[claim] = userinfo[claim]
+
+        return claims

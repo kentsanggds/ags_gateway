@@ -12,6 +12,11 @@ def authenticate(view_fn):
     def wrapper(*args, **kwargs):
 
         if _reauthentication_necessary():
+
+            current_app.logger.info(
+                'Redirecting to {idp} for authentication'.format(
+                    idp=current_app.config['OIDC_CLIENT']['issuer']))
+
             return _authenticate()
 
         return view_fn(*args, **kwargs)
@@ -41,12 +46,18 @@ def _authentication_request():
         request_args={
             'client_id': client.client_id,
             'response_type': 'code',
-            'scope': ['openid'],
+            'scope': ['openid', 'profile'],
             'redirect_uri': client.registration_response['redirect_uris'][0],
             'state': session['state'],
             'nonce': session['nonce'],
             'kc_idp_hint': session['idp_hint'],
             'login_hint': session['email_address'],
+            'claims': {
+                'userinfo': {
+                    'email': {'essential': True},
+                    'name': {'essential': True}
+                }
+            }
         }
     )
 
@@ -61,10 +72,12 @@ def logout(view_fn):
         id_token_jwt = session['id_token_jwt']
 
         if not _is_logout_redirect_callback():
+            current_app.logger.info('Clearing session')
             session.clear()
 
             url = _provider_logout_url(id_token_jwt)
             if url:
+                current_app.logger.info('Logging out of IDP')
                 return redirect(url, 303)
 
         return view_fn(*args, **kwargs)

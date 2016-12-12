@@ -3,6 +3,8 @@
 AGS Gateway app factory
 """
 
+import logging
+import logging.config
 import os
 
 from flask import Flask, render_template
@@ -13,12 +15,19 @@ def create_app(config='config.py', **kwargs):
     app.config.from_pyfile(config)
     app.config.update(kwargs)
 
+    configure_logger(app)
+
     register_blueprints(app)
     register_context_processors(app)
     register_error_handlers(app)
     register_extensions(app)
 
     return app
+
+
+def configure_logger(app):
+    app.logger
+    logging.config.dictConfig(app.config.get('LOGGING', {}))
 
 
 def register_blueprints(app):

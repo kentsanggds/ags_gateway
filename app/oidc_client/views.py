@@ -4,11 +4,31 @@ from oic.oic.message import AuthorizationResponse
 
 
 def callback():
+    current_app.logger.info('Handling authentication callback')
+
     code, state = _parse_auth_response()
+
+    current_app.logger.info('Exchanging authz code for access and id tokens')
+
     id_token, access_token = _get_tokens(code, state)
+
+    current_app.logger.info('Requesting userinfo')
+
     userinfo = _get_userinfo(id_token, state)
 
-    _update_session(id_token, access_token, userinfo)
+    session.update({
+        'id_token': id_token.to_dict(),
+        'id_token_jwt': id_token.to_jwt(),
+        'access_token': access_token
+    })
+
+    if userinfo:
+        session['userinfo'] = userinfo.to_dict()
+
+    current_app.provider.userinfo[id_token['sub']] = userinfo.to_dict()
+
+    current_app.logger.info('Redirecting to {destination}'.format(
+        destination=session.get('destination')))
 
     return redirect(session.pop('destination'))
 
@@ -62,14 +82,3 @@ def _get_userinfo(id_token, state):
             "The userinfo 'sub' does not match the id token 'sub'")
 
     return userinfo
-
-
-def _update_session(id_token, access_token, userinfo):
-    session.update({
-        'id_token': id_token.to_dict(),
-        'id_token_jwt': id_token.to_jwt(),
-        'access_token': access_token
-    })
-
-    if userinfo:
-        session['userinfo'] = userinfo.to_dict()
