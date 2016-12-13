@@ -3,7 +3,6 @@ from wtforms import RadioField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Email, Optional
 
-
 yesno = [(True, 'Yes'), (False, 'No')]
 
 
@@ -25,6 +24,10 @@ class IdpConfirmForm(FlaskForm):
 
 class IdpSelectForm(FlaskForm):
     idp = RadioField(choices=[])
+
+
+class DeptConfirmForm(FlaskForm):
+    confirm = RadioField(choices=yesno, coerce=coerce_bool)
 
 
 class DeptSelectForm(FlaskForm):
