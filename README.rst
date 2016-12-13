@@ -35,11 +35,27 @@ Configuration
 The gateway service looks for certain environment variables for settings. The
 following variables are **REQUIRED**:
 
-``AGS_CLIENT_ID``
+``OIDC_CLIENT_ISSUER``
+    The base URL of the OIDC broker
+
+``OIDC_CLIENT_ID``
     The client ID that you have been issued
 
-``AGS_CLIENT_SECRET``
+``OIDC_CLIENT_SECRET``
     The client secret that you have been issued
+
+The following veriables are **OPTIONAL**:
+
+``PORT``
+    The port number the gateway app will listen on - defaults to ``5000``
+
+``SERVER_NAME``
+    The hostname (and port number, if not 80) of the gateway server - defaults
+    to ``localhost:$PORT``
+
+``SECRET_KEY``
+    The secret used to encrypt session cookies - override this if deploying to
+    multiple hosts - WARNING defaults to an insecure secret
 
 
 Support
