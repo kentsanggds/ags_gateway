@@ -1,0 +1,24 @@
+// Messaging panels
+// Similar to those used on Verify
+// ======================================================================
+
+.messaging-panel {
+  @extend %contain-floats;
+  background: $link-colour;
+  box-sizing: border-box;
+  color: $page-colour;
+  width: 100%;
+  padding: 60px 70px;
+
+  .panel {
+    border-color: $page-colour;
+  }
+}
+
+.single-image {
+  text-align: center;
+}
+
+.panel-content {
+  padding-top: $gutter-half;
+}

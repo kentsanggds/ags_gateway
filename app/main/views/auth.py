@@ -7,6 +7,7 @@ from flask import redirect, render_template, request, session, url_for, jsonify
 
 from app.main import main
 from app.main.forms import (
+    ChangeEmailForm,
     DeptConfirmForm,
     DeptSelectForm,
     EmailForm,
@@ -87,6 +88,32 @@ def authentication_request():
         return redirect(url_for('.confirm_idp'))
 
     return redirect(url_for('.request_email_address'))
+
+
+@main.route('/change-email-address', methods=['GET', 'POST'])
+def change_email_address():
+
+    form = ChangeEmailForm()
+
+    if form.validate_on_submit():
+
+        session['email_address'] = form.email_address.data
+        idp = idp_from_email_address(form.email_address.data)
+
+        if idp is None:
+            return redirect_to_broker(IDP_OF_LAST_RESORT)
+
+        session['idp_choices'] = [item['id'] for item in idp]
+
+        if len(idp) > 1:
+            return redirect(url_for('.select_idp'))
+
+        session['resolved_idp'] = idp[0].get("id")
+        session['department_name'] = idp[0].get("name")
+
+        return redirect(url_for('.confirm_dept'))
+
+    return render_template('views/auth/change_email.html', form=form)
 
 
 @main.route('/confirm-email-address', methods=['GET', 'POST'])
@@ -196,5 +223,5 @@ def to_idp():
 
 @main.route('/to-service', methods=['GET', 'POST'])
 def to_service():
-
-    return render_template('views/auth/to_service.html')
+    print(session['auth_req'].get('redirect_uri'))
+    return render_template('views/auth/to_service.html', next_url='http://localhost:6012/')
