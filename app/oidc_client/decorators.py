@@ -41,7 +41,6 @@ def _authenticate():
 
 def _authentication_request():
     client = current_app.extensions['oidc_client'].client
-
     auth_req = client.construct_AuthorizationRequest(
         request_args={
             'client_id': client.client_id,
@@ -50,7 +49,7 @@ def _authentication_request():
             'redirect_uri': client.registration_response['redirect_uris'][0],
             'state': session['state'],
             'nonce': session['nonce'],
-            'kc_idp_hint': session['idp_hint'],
+            'kc_idp_hint': session.get('idp_hint', request.args.get('idp_hint', None)),
             'login_hint': session['email_address'],
             'claims': {
                 'userinfo': {

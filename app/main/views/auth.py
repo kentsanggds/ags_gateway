@@ -2,11 +2,12 @@
 """
 Handle OIDC authentication requests
 """
-
-from flask import redirect, render_template, request, session, url_for
+import re
+from flask import redirect, render_template, request, session, url_for, jsonify
 
 from app.main import main
 from app.main.forms import (
+    DeptConfirmForm,
     DeptSelectForm,
     EmailForm,
     IdpConfirmForm,
@@ -17,26 +18,43 @@ IDP_OF_LAST_RESORT = 'idp of last resort'
 
 idp_names = {
     'gds-google': 'Government Digital Service',
-    'dex': 'Cabinet Office',
+    'co-digital': 'Cabinet Office',
     'ad-saml': 'Azure AD SAML2',
 }
+
+idp_profiles = [
+    {
+        'id': 'gds-google',
+        'name': 'Government Digital Service',
+        'email_pattern': '@digital.cabinet-office\.'
+    },
+    {
+        'id': 'co-digital',
+        'name': 'Cabinet Office',
+        'email_pattern': '@cabinetoffice\.'
+    }
+]
 
 
 def redirect_to_broker(idp):
     session['idp_hint'] = idp
+    url = url_for('broker.auth', idp_hint=idp)
+    print("broker:{}".format(url))
     return redirect(url_for('broker.auth', idp_hint=idp))
 
 
 def idp_from_email_address(email_address):
-    client_id = session['auth_request']['client_id']
+    idp_list = []
 
-    if client_id == 'notify-test':
-        return ['gds-google', 'ad-saml']
+    for idp in idp_profiles:
+        match = re.search(idp['email_pattern'], email_address)
+        if match:
+            idp_list.append(idp)
 
-    idp = session['auth_req'].get('email_idp', '')
-    if ',' in idp:
-        idp = idp.split(',')
-    return idp
+    if idp_list:
+        return idp_list
+
+    return None
 
 
 def idp_for_dept(dept):
@@ -54,6 +72,10 @@ def authentication_request():
         del session['suggested_idp']
     if 'email_address' in session:
         del session['email_address']
+    if 'resolved_idp' in session:
+        del session['resolved_idp']
+    if 'department_name' in session:
+        del session['department_name']
 
     session['auth_req'] = request.args
 
@@ -82,11 +104,15 @@ def request_email_address():
             if idp is None:
                 return redirect_to_broker(IDP_OF_LAST_RESORT)
 
-            if isinstance(idp, list):
-                session['idp_choices'] = idp
+            session['idp_choices'] = [item['id'] for item in idp]
+
+            if len(idp) > 1:
                 return redirect(url_for('.select_idp'))
 
-            return redirect_to_broker(idp)
+            session['resolved_idp'] = idp[0].get("id")
+            session['department_name'] = idp[0].get("name")
+
+            return redirect(url_for('.confirm_dept'))
 
         else:
             return redirect(url_for('.select_dept'))
@@ -111,7 +137,6 @@ def select_idp():
 
 @main.route('/confirm-identity-provider', methods=['GET', 'POST'])
 def confirm_idp():
-
     form = IdpConfirmForm()
     idp = session['suggested_idp']
 
@@ -128,7 +153,8 @@ def confirm_idp():
 @main.route('/select-department', methods=['GET', 'POST'])
 def select_dept():
 
-    form = DeptSelectForm()
+    form = DeptSelectForm(
+        dept_list=[{'id': 'gds-google', 'desc': 'GDS Google'}])
 
     if form.validate_on_submit():
 
@@ -139,3 +165,36 @@ def select_dept():
         return redirect_to_broker(IDP_OF_LAST_RESORT)
 
     return render_template('views/auth/select_dept.html', form=form)
+
+
+@main.route('/_search-dept')
+def _search_dept():
+    search_term = request.args.get('search_term', 0, type=str)
+    return jsonify([
+        {'id': 'GDS', 'descr': 'Government Digital Services'},
+        {'id': 'CO', 'descr': 'Cabinet Office'}
+    ])
+
+
+@main.route('/confirm-department', methods=['GET', 'POST'])
+def confirm_dept():
+    form = DeptConfirmForm()
+
+    if form.validate_on_submit():
+        if form.confirm.data:
+            return redirect(url_for('.to_idp'))
+
+        return redirect(url_for('.request_email_address'))
+
+    return render_template('views/auth/confirm_dept.html', form=form, department=session['department_name'])
+
+
+@main.route('/to-idp', methods=['GET', 'POST'])
+def to_idp():
+    return render_template('views/auth/to_idp.html', idp=session['resolved_idp'])
+
+
+@main.route('/to-service', methods=['GET', 'POST'])
+def to_service():
+
+    return render_template('views/auth/to_service.html')
