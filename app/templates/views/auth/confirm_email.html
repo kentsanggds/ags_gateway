@@ -14,7 +14,7 @@
           {{subfields[0](aria_controls="know-email", aria_expanded="true", checked="checked")}}
           {{subfields[0].label}}
         </label>
-        <div class="panel panel-border-narrow{% if form.email_address.errors %} error{% endif %}" id="know-email" aria-hidden="false">
+        <div class="panel panel-border-narrow sub-selection-input{% if form.email_address.errors %} error{% endif %}" id="know-email" aria-hidden="false">
           <label class="form-label-bold" for="{{form.email_address.id}}">
             {{form.email_address.label}}
             <span class="form-hint"></span>
