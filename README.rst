@@ -44,7 +44,7 @@ following variables are **REQUIRED**:
 ``OIDC_CLIENT_SECRET``
     The client secret that you have been issued
 
-The following veriables are **OPTIONAL**:
+The following variables are **OPTIONAL**:
 
 ``PORT``
     The port number the gateway app will listen on - defaults to ``5000``
