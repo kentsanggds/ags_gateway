@@ -59,17 +59,27 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'default',
             'level': 'DEBUG'
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'default',
+            'level': 'DEBUG',
+            'filename': '/tmp/gateway.log',
         }
     },
     'loggers': {
         'app.factory': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'DEBUG',
-            'propagate': False
         },
-        'werkzeug': {
-            'propagate': False
-        },
+        'waitress': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        }
+    },
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['console', 'file'],
     },
 }
 
