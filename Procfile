@@ -1,1 +1,1 @@
-web: gunicorn -b 0.0.0.0:$PORT 'app.factory:create_app()'
+web: waitress-serve --port=$PORT --call app.factory:create_app
