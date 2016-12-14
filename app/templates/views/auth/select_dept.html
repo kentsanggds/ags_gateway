@@ -2,22 +2,52 @@
 
 {% block main_content %}
 
-  <h1 class="heading-xlarge">Select IDP</h1>
+  <h1 class="heading-xlarge">Select department</h1>
 
   <form class="form">
-    <label for="" class="form-label">Search for your department, ALB or agency</label>
+    {{form.dept_list}}
+    <label for="" class="form-label">Search for your department</label>
     <div class="main-search idp-search">
-      <input type="text" class="search__input" id="person-search" placeholder="enter department name here" />
+      <input type="text" class="search__input" id="dept-search" placeholder="enter department name here" />
       <input class="search__submit" type="submit" value="Search" />
     </div>
   </form>
 
-  <div class="search-tabs">
-    <ul>
-      <li><a href="#all">All</a></li>
-      <li class="active"><a href="#departments">Departments</a></li>
-      <li><a href="#agencies">Agencies</a></li>
-    </ul>
-  </div>
+{% endblock %}
 
+{% block body_end %}
+<script type=text/javascript>
+var searchRequest = null;
+
+$(function () {
+    var minlength = 3;
+
+    $("#dept-search").keyup(function () {
+        var that = this,
+        value = $(this).val();
+
+        console.log('search');
+
+        if (value.length >= minlength ) {
+            if (searchRequest != null) 
+                searchRequest.abort();
+            searchRequest = $.ajax({
+                type: "GET",
+                url: "/_search-dept",
+                data: {
+                    'search_term' : value
+                },
+                dataType: "text",
+                success: function(msg){
+                    //we need to check if the value is the same
+                    if (value==$(that).val()) {
+                      console.log(msg);
+                    //Receiving the result of search here
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

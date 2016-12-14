@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<main id="content" role="main">
+
+
+  <h1 class="heading-large">
+    You have been signed out
+  </h1>
+
+  <a href="{{next_url}}">Return to Notify</a>
+
+  <div class="notice">
+      <i class="icon icon-important">
+        <span class="visually-hidden">Warning</span>
+      </i>
+      <p class="text">
+        You are still logged into your email account. <a href="">Go to email account to log out</a>
+      </p>
+  </div>
+
+</main>
+  
+{% endblock %}
