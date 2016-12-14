@@ -40,7 +40,13 @@ def init_oidc_provider(app):
         'notify-test': {
             'client_name': 'GOV.UK Notify',
             'client_secret': 'notify-secret',
+            'client_uri': 'https://admin-ags.notify.works/',
+            'post_logout_redirect_uris': [
+                'https://admin-ags.notify.works/sign-out',
+                'http://localhost:6012/sign-out',
+            ],
             'redirect_uris': [
+                'https://admin-ags.notify.works/oidc_callback',
                 'http://localhost:6012/oidc_callback',
             ],
             'response_types': [

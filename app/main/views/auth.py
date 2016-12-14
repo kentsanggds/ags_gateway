@@ -223,5 +223,4 @@ def to_idp():
 
 @main.route('/to-service', methods=['GET', 'POST'])
 def to_service():
-    print(session['auth_req'].get('redirect_uri'))
-    return render_template('views/auth/to_service.html', next_url='http://localhost:6012/')
+    return render_template('views/auth/to_service.html', next_url=session['auth_redirect'])
