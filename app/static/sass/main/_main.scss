@@ -170,3 +170,7 @@ html, body {
   float: right;
   padding: 0 0 0 15px;
 }
+
+.block-label + .panel {
+  margin-left: 16px;
+}
