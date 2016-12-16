@@ -28,13 +28,21 @@ idp_profiles = [
     {
         'id': 'gds-google',
         'name': 'Government Digital Service',
-        'email_pattern': '^[^@]+@digital\.cabinet-office\.gov\.uk$'
+        'email_pattern': '^[^@]+@digital\.cabinet-office\.gov\.uk$',
+        'hint': 'All @digital.cabinet-office.gov.uk accounts'
     },
     {
         'id': 'co-digital',
         'name': 'Cabinet Office',
-        'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$'
-    }
+        'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$',
+        'hint': 'CO staff on the Official platform. @cabinet-office.gov.uk accounts only.'
+    },
+    {
+        'id': 'ad-saml',
+        'name': 'Civil Service Digital',
+        'email_pattern': '^[^@]+@sso\.civilservice\.uk$',
+        'hint': 'GDS staff in AGS, @sso.civilservice.digital accounts'
+    },
 ]
 
 
@@ -151,14 +159,14 @@ def confirm_idp():
 @main.route('/select-department', methods=['GET', 'POST'])
 def select_dept():
 
-    form = DeptSelectForm(
-        dept_list=[{'id': 'gds-google', 'desc': 'GDS Google'}])
+    form = DeptSelectForm()
+    form.dept.choices = [(d['id'], "{}|{}".format(d['name'], d['hint']))
+                         for d in idp_profiles]
 
     if form.validate_on_submit():
-
         if form.dept.data:
-            session['suggested_idp'] = idp_for_dept(form.dept.data)
-            return redirect(url_for('.confirm_idp'))
+            session['suggested_idp'] = form.dept.data
+            return redirect(url_for('.to_idp'))
 
         return redirect_to_broker(IDP_OF_LAST_RESORT)
 
