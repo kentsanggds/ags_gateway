@@ -11,7 +11,6 @@ from flask import (
     request,
     session,
     url_for,
-    json,
 )
 from oic.oic.message import (
     AuthorizationRequest,
@@ -82,7 +81,6 @@ def authorize():
 
     return auth_response.request(
         auth_request['redirect_uri'],
-        # url_for('main.to_service'),
         should_fragment_encode(auth_request))
 
 
@@ -158,20 +156,6 @@ def userinfo_error(exception):
     return response
 
 
-# @op.route('/oidc/logout', methods=['GET', 'POST'])
-# def logout():
-#     if request.method == 'POST':
-
-#         if 'logout' in request.form:
-#             return do_logout()
-
-#         return make_response('You chose not to logout')
-
-#     session['end_session_request'] = request.args
-
-#     return render_template('views/oidc_provider/logout.html')
-
-
 @op.route('/logout-info', methods=['GET', 'POST'])
 def logout_info():
 
@@ -179,7 +163,6 @@ def logout_info():
 
 
 @op.route('/oidc/logout', methods=['GET', 'POST'])
-# def do_logout():
 def logout():
 
     end_session_request = EndSessionRequest().deserialize(urlencode(request.args))
@@ -198,11 +181,11 @@ def logout():
 def logout_user():
     params = session['end_session_request']
 
-    print("logout_user:{}".format(params))
+    current_app.logger.info("logout_user:{}".format(params))
 
     params.update({'id_token_hint': session['id_token_jwt']})
 
-    print("logout_user2:{}".format(params))
+    current_app.logger.info("logout_user_post_update:{}".format(params))
 
     request = EndSessionRequest().from_dict(params)
 
