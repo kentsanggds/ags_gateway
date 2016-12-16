@@ -73,9 +73,8 @@ def redirect_based_on_email_address(email_address):
     if not idp:
         return redirect_to_broker(IDP_OF_LAST_RESORT)
 
-    session['idp_choices'] = [item['id'] for item in idp]
-
     if len(idp) > 1:
+        session['idp_choices'] = [item['id'] for item in idp]
         return redirect(url_for('.select_idp'))
 
     session['suggested_idp'] = idp[0]['id']
@@ -86,7 +85,14 @@ def redirect_based_on_email_address(email_address):
 
 @main.route('/auth', methods=['GET', 'POST'])
 def authentication_request():
-    session.clear()
+    if 'idp_choices' in session:
+        del session['idp_choices']
+    if 'suggested_idp' in session:
+        del session['suggested_idp']
+    if 'email_address' in session:
+        del session['email_address']
+    if 'department_name' in session:
+        del session['department_name']
 
     session['auth_req'] = request.args
 
@@ -173,8 +179,8 @@ def select_dept():
     return render_template('views/auth/select_dept.html', form=form)
 
 
-@main.route('/_search-dept')
-def _search_dept():
+@main.route('/search-dept')
+def search_dept():
     search_term = request.args.get('search_term', 0, type=str)
     return jsonify([
         {'id': 'GDS', 'descr': 'Government Digital Services'},
@@ -192,14 +198,14 @@ def confirm_dept():
 
         return redirect(url_for('.request_email_address'))
 
-    return render_template('views/auth/confirm_dept.html', form=form, department=session['department_name'])
+    return render_template('views/auth/confirm_dept.html', form=form)
 
 
 @main.route('/to-idp', methods=['GET', 'POST'])
 def to_idp():
-    return render_template('views/auth/to_idp.html', idp=session['suggested_idp'])
+    return render_template('views/auth/to_idp.html')
 
 
 @main.route('/to-service', methods=['GET', 'POST'])
 def to_service():
-    return render_template('views/auth/to_service.html', next_url=session['auth_redirect'])
+    return render_template('views/auth/to_service.html')
