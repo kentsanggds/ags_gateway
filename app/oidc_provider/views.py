@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import requests
 from urllib.parse import unquote, urlencode
 
 from flask import (
