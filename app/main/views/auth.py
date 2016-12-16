@@ -201,11 +201,11 @@ def confirm_dept():
     return render_template('views/auth/confirm_dept.html', form=form)
 
 
-@main.route('/to-idp', methods=['GET', 'POST'])
+@main.route('/to-idp')
 def to_idp():
     return render_template('views/auth/to_idp.html')
 
 
-@main.route('/to-service', methods=['GET', 'POST'])
+@main.route('/to-service')
 def to_service():
     return render_template('views/auth/to_service.html')
