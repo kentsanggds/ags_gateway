@@ -13,7 +13,7 @@ def coerce_bool(x):
 
 
 class DeptConfirmForm(FlaskForm):
-    confirm = RadioField(choices=yesno, default='Yes')
+    confirm = RadioField(choices=yesno, default='yes')
 
 
 class DeptSelectForm(FlaskForm):
@@ -26,7 +26,7 @@ class ChangeEmailForm(FlaskForm):
 
 
 class EmailForm(FlaskForm):
-    email_known = RadioField(choices=yesno, default='Yes')
+    email_known = RadioField(choices=yesno, default='yes')
     email_address = EmailField('Email', validators=[
         Optional(), Email()])
 
