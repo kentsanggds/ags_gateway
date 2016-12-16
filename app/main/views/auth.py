@@ -40,8 +40,6 @@ idp_profiles = [
 
 def redirect_to_broker(idp):
     session['idp_hint'] = idp
-    url = url_for('broker.auth', idp_hint=idp)
-    print("broker:{}".format(url))
     return redirect(url_for('broker.auth', idp_hint=idp))
 
 
