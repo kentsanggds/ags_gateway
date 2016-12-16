@@ -63,7 +63,6 @@ def auth():
         raise BadRequest('Something went wrong: {}'.format(str(error)))
 
     session['auth_request'] = auth_request.to_dict()
-
     return redirect(url_for('main.authentication_request'))
 
 
@@ -74,17 +73,11 @@ def parse_auth_request():
 
 def authorize():
     id_token = session['id_token']
-    extra_claims = {}
-    for claim, value in id_token.items():
-        if claim not in [
-                'iss', 'sub', 'aud', 'exp', 'iat', 'auth_time', 'nonce', 'acr',
-                'amr', 'azp', 'at_hash', 'c_hash', 'typ']:
-            extra_claims[claim] = value
     auth_request = AuthorizationRequest(**session['auth_request'])
     auth_response = current_app.provider.authorize(
         auth_request,
-        id_token['sub'],
-        extra_id_token_claims=extra_claims)
+        id_token['sub'])
+
     return auth_response.request(
         auth_request['redirect_uri'],
         should_fragment_encode(auth_request))
@@ -162,22 +155,18 @@ def userinfo_error(exception):
     return response
 
 
+@op.route('/logout-info', methods=['GET', 'POST'])
+def logout_info():
+
+    return render_template('views/logout_info.html', next_url=session['logout_redirect'])
+
+
 @op.route('/oidc/logout', methods=['GET', 'POST'])
 def logout():
 
-    if request.method == 'POST':
+    end_session_request = EndSessionRequest().deserialize(urlencode(request.args))
 
-        if 'logout' in request.form:
-            return do_logout()
-
-        return make_response('You chose not to logout')
-
-    session['end_session_request'] = request.args
-
-    return render_template('views/oidc_provider/logout.html')
-
-
-def do_logout():
+    session['end_session_request'] = end_session_request.to_dict()
 
     try:
         redirect_url = logout_user()
@@ -185,20 +174,19 @@ def do_logout():
     except InvalidSubjectIdentifier as error:
         raise BadRequest('Logout unsuccessful')
 
-    if redirect_url:
-        return redirect(redirect_url)
-
-    if 'post_logout_redirect_uri' in request.args:
-        return redirect(unquote(request.args['post_logout_redirect_uri']))
-
-    return make_response('Logout successful')
+    return render_template('views/logout_info.html', next_url=redirect_url)
 
 
 def logout_user():
     params = session['end_session_request']
+
+    current_app.logger.info("logout_user:{}".format(params))
+
     params.update({'id_token_hint': session['id_token_jwt']})
 
-    request = EndSessionRequest().deserialize(urlencode(params))
+    current_app.logger.info("logout_user_post_update:{}".format(params))
+
+    request = EndSessionRequest().from_dict(params)
 
     current_app.provider.logout_user(end_session_request=request)
 

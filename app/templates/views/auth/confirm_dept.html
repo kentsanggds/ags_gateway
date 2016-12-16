@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+  <a href="/" class="link-back">Back</a>
+
+<div id="confirm-dept">
+  <h1 class="heading-large text">Confirm the department that you work for</h1>
+
+  <div class="text email-callout">
+    <p>Email address you provided</p>
+    <div class="email-given">{{ session["email_address"] }}</div>
+    <p><a href="{{ url_for('main.change_email_address', email_address=session["email_address"]) }}">Change email</a></p>
+  </div>
+
+  <h2 class="heading-medium">Do you work for the {{ session["department_name"] }}?</h2>
+
+  <form id="form" method="post">{{ form.csrf_token }}
+    <div class="form-group">
+      <fieldset>
+            <legend class="visuallyhidden">Do you work for {{ session["department_name"] }}?</legend>
+
+            {% with subfields=form.confirm|list %}
+            <label class="block-label selection-button-radio" for="{{subfields[0].id}}">
+            {{subfields[0]}}
+            {{subfields[0].label}}
+            </label>
+
+            <label class="block-label selection-button-radio" for="{{subfields[1].id}}">
+            {{subfields[1]}}
+            {{subfields[1].label}}
+            </label>
+            {% endwith %}
+      </fieldset>
+    </div>
+
+    <div class="form-group">
+      <button class="button">Confirm</button>
+      </div>
+
+    <div class="form-group">
+      <div class="panel text">
+        <p>You will be redirected to your work email provider.</p>
+        <p>If you are already signed in to your email account you will not be prompted to enter your details again.</p>
+      </div>
+    </div>
+  </form>
+</div>
+<div id="to-idp" style="display:none;">
+    <div class="messaging-panel">
+        <div class="gird-row">
+        <div class="column-quarter single-image">
+            <img src="/static/images/icon-not-authenticated.png" alt="" />
+        </div>
+        <div class="column-three-quarters panel-content">
+            <p class="lede">We are now redirecting you to your work email. This will allow you to be authenticated.</p>
+            <div class="panel">If you already have an active session you will not be asked to re-enter you credentials.</div>
+        </div>
+        </div>
+
+    </div>
+  </div>
+
+{% endblock %}

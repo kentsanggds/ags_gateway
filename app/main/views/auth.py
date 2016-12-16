@@ -2,11 +2,14 @@
 """
 Handle OIDC authentication requests
 """
+import re
 
-from flask import redirect, render_template, request, session, url_for
+from flask import jsonify, redirect, render_template, request, session, url_for
 
 from app.main import main
 from app.main.forms import (
+    ChangeEmailForm,
+    DeptConfirmForm,
     DeptSelectForm,
     EmailForm,
     IdpConfirmForm,
@@ -17,9 +20,30 @@ IDP_OF_LAST_RESORT = 'idp of last resort'
 
 idp_names = {
     'gds-google': 'Government Digital Service',
-    'dex': 'Cabinet Office',
+    'co-digital': 'Cabinet Office',
     'ad-saml': 'Azure AD SAML2',
 }
+
+idp_profiles = [
+    {
+        'id': 'gds-google',
+        'name': 'Government Digital Service',
+        'email_pattern': '^[^@]+@digital\.cabinet-office\.gov\.uk$',
+        'hint': 'All @digital.cabinet-office.gov.uk accounts'
+    },
+    {
+        'id': 'co-digital',
+        'name': 'Cabinet Office',
+        'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$',
+        'hint': 'CO staff on the Official platform. @cabinet-office.gov.uk accounts only.'
+    },
+    {
+        'id': 'ad-saml',
+        'name': 'Civil Service Digital',
+        'email_pattern': '^[^@]+@sso\.civilservice\.uk$',
+        'hint': 'GDS staff in AGS, @sso.civilservice.digital accounts'
+    },
+]
 
 
 def redirect_to_broker(idp):
@@ -28,15 +52,11 @@ def redirect_to_broker(idp):
 
 
 def idp_from_email_address(email_address):
-    client_id = session['auth_request']['client_id']
+    return [idp for idp in idp_profiles if match_idp_email(idp, email_address)]
 
-    if client_id == 'notify-test':
-        return ['gds-google', 'ad-saml']
 
-    idp = session['auth_req'].get('email_idp', '')
-    if ',' in idp:
-        idp = idp.split(',')
-    return idp
+def match_idp_email(idp, email_address):
+    return re.match(idp['email_pattern'], email_address)
 
 
 def idp_for_dept(dept):
@@ -44,6 +64,23 @@ def idp_for_dept(dept):
     if ',' in idp:
         idp = idp.split(',')
     return idp
+
+
+def redirect_based_on_email_address(email_address):
+    session['email_address'] = email_address
+    idp = idp_from_email_address(email_address)
+
+    if not idp:
+        return redirect_to_broker(IDP_OF_LAST_RESORT)
+
+    if len(idp) > 1:
+        session['idp_choices'] = [item['id'] for item in idp]
+        return redirect(url_for('.select_idp'))
+
+    session['suggested_idp'] = idp[0]['id']
+    session['department_name'] = idp[0]['name']
+
+    return redirect(url_for('.confirm_dept'))
 
 
 @main.route('/auth', methods=['GET', 'POST'])
@@ -54,6 +91,8 @@ def authentication_request():
         del session['suggested_idp']
     if 'email_address' in session:
         del session['email_address']
+    if 'department_name' in session:
+        del session['department_name']
 
     session['auth_req'] = request.args
 
@@ -67,6 +106,17 @@ def authentication_request():
     return redirect(url_for('.request_email_address'))
 
 
+@main.route('/change-email-address', methods=['GET', 'POST'])
+def change_email_address():
+
+    form = ChangeEmailForm()
+
+    if form.validate_on_submit():
+        return redirect_based_on_email_address(form.email_address.data)
+
+    return render_template('views/auth/change_email.html', form=form)
+
+
 @main.route('/confirm-email-address', methods=['GET', 'POST'])
 def request_email_address():
 
@@ -74,22 +124,10 @@ def request_email_address():
 
     if form.validate_on_submit():
 
-        if form.email_known.data:
+        if form.email_known.data == 'yes':
+            return redirect_based_on_email_address(form.email_address.data)
 
-            session['email_address'] = form.email_address.data
-            idp = idp_from_email_address(form.email_address.data)
-
-            if idp is None:
-                return redirect_to_broker(IDP_OF_LAST_RESORT)
-
-            if isinstance(idp, list):
-                session['idp_choices'] = idp
-                return redirect(url_for('.select_idp'))
-
-            return redirect_to_broker(idp)
-
-        else:
-            return redirect(url_for('.select_dept'))
+        return redirect(url_for('.select_dept'))
 
     return render_template('views/auth/confirm_email.html', form=form)
 
@@ -111,13 +149,12 @@ def select_idp():
 
 @main.route('/confirm-identity-provider', methods=['GET', 'POST'])
 def confirm_idp():
-
     form = IdpConfirmForm()
     idp = session['suggested_idp']
 
     if form.validate_on_submit():
 
-        if form.confirm.data:
+        if form.confirm.data == 'yes':
             return redirect_to_broker(idp)
 
         return redirect(url_for('.request_email_address'))
@@ -129,13 +166,46 @@ def confirm_idp():
 def select_dept():
 
     form = DeptSelectForm()
+    form.dept.choices = [(d['id'], "{}|{}".format(d['name'], d['hint']))
+                         for d in idp_profiles]
 
     if form.validate_on_submit():
-
         if form.dept.data:
-            session['suggested_idp'] = idp_for_dept(form.dept.data)
-            return redirect(url_for('.confirm_idp'))
+            session['suggested_idp'] = form.dept.data
+            return redirect(url_for('.to_idp'))
 
         return redirect_to_broker(IDP_OF_LAST_RESORT)
 
     return render_template('views/auth/select_dept.html', form=form)
+
+
+@main.route('/search-dept')
+def search_dept():
+    search_term = request.args.get('search_term', 0, type=str)
+    return jsonify([
+        {'id': 'GDS', 'descr': 'Government Digital Services'},
+        {'id': 'CO', 'descr': 'Cabinet Office'}
+    ])
+
+
+@main.route('/confirm-department', methods=['GET', 'POST'])
+def confirm_dept():
+    form = DeptConfirmForm()
+
+    if form.validate_on_submit():
+        if form.confirm.data:
+            return redirect(url_for('.to_idp'))
+
+        return redirect(url_for('.request_email_address'))
+
+    return render_template('views/auth/confirm_dept.html', form=form)
+
+
+@main.route('/to-idp')
+def to_idp():
+    return render_template('views/auth/to_idp.html')
+
+
+@main.route('/to-service')
+def to_service():
+    return render_template('views/auth/to_service.html')
