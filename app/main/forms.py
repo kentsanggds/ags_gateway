@@ -3,7 +3,7 @@ from wtforms import RadioField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Email, Optional, Required
 
-yesno = [(True, 'Yes'), (False, 'No')]
+yesno = [('yes', 'Yes'), ('no', 'No')]
 
 
 def coerce_bool(x):
@@ -13,7 +13,7 @@ def coerce_bool(x):
 
 
 class DeptConfirmForm(FlaskForm):
-    confirm = RadioField(choices=yesno, default='Yes', coerce=coerce_bool)
+    confirm = RadioField(choices=yesno, default='Yes')
 
 
 class DeptSelectForm(FlaskForm):
@@ -26,7 +26,7 @@ class ChangeEmailForm(FlaskForm):
 
 
 class EmailForm(FlaskForm):
-    email_known = RadioField(choices=yesno, default='Yes', coerce=coerce_bool)
+    email_known = RadioField(choices=yesno, default='Yes')
     email_address = EmailField('Email', validators=[
         Optional(), Email()])
 
