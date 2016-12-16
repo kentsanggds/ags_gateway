@@ -70,8 +70,8 @@ def redirect_based_on_email_address(email_address):
     if len(idp) > 1:
         return redirect(url_for('.select_idp'))
 
-    session['resolved_idp'] = idp[0].get("id")
-    session['department_name'] = idp[0].get("name")
+    session['suggested_idp'] = idp[0]['id']
+    session['department_name'] = idp[0]['name']
 
     return redirect(url_for('.confirm_dept'))
 
@@ -112,8 +112,8 @@ def request_email_address():
 
         if form.email_known.data == 'yes':
             return redirect_based_on_email_address(form.email_address.data)
-        else:
-            return redirect(url_for('.select_dept'))
+
+        return redirect(url_for('.select_dept'))
 
     return render_template('views/auth/confirm_email.html', form=form)
 
@@ -140,7 +140,7 @@ def confirm_idp():
 
     if form.validate_on_submit():
 
-        if form.confirm.data:
+        if form.confirm.data == 'yes':
             return redirect_to_broker(idp)
 
         return redirect(url_for('.request_email_address'))
@@ -189,7 +189,7 @@ def confirm_dept():
 
 @main.route('/to-idp', methods=['GET', 'POST'])
 def to_idp():
-    return render_template('views/auth/to_idp.html', idp=session['resolved_idp'])
+    return render_template('views/auth/to_idp.html', idp=session['suggested_idp'])
 
 
 @main.route('/to-service', methods=['GET', 'POST'])
