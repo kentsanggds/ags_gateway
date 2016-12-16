@@ -44,17 +44,11 @@ def redirect_to_broker(idp):
 
 
 def idp_from_email_address(email_address):
-    idp_list = []
+    return [idp for idp in idp_profiles if match_idp_email(idp, email_address)]
 
-    for idp in idp_profiles:
-        match = re.search(idp['email_pattern'], email_address)
-        if match:
-            idp_list.append(idp)
 
-    if idp_list:
-        return idp_list
-
-    return None
+def match_idp_email(idp, email_address):
+    return re.match(idp['email_pattern'], email_address)
 
 
 def idp_for_dept(dept):
@@ -64,18 +58,27 @@ def idp_for_dept(dept):
     return idp
 
 
+def redirect_based_on_email_address(email_address):
+    session['email_address'] = email_address
+    idp = idp_from_email_address(email_address)
+
+    if not idp:
+        return redirect_to_broker(IDP_OF_LAST_RESORT)
+
+    session['idp_choices'] = [item['id'] for item in idp]
+
+    if len(idp) > 1:
+        return redirect(url_for('.select_idp'))
+
+    session['resolved_idp'] = idp[0].get("id")
+    session['department_name'] = idp[0].get("name")
+
+    return redirect(url_for('.confirm_dept'))
+
+
 @main.route('/auth', methods=['GET', 'POST'])
 def authentication_request():
-    if 'idp_choices' in session:
-        del session['idp_choices']
-    if 'suggested_idp' in session:
-        del session['suggested_idp']
-    if 'email_address' in session:
-        del session['email_address']
-    if 'resolved_idp' in session:
-        del session['resolved_idp']
-    if 'department_name' in session:
-        del session['department_name']
+    session.clear()
 
     session['auth_req'] = request.args
 
@@ -95,22 +98,7 @@ def change_email_address():
     form = ChangeEmailForm()
 
     if form.validate_on_submit():
-
-        session['email_address'] = form.email_address.data
-        idp = idp_from_email_address(form.email_address.data)
-
-        if idp is None:
-            return redirect_to_broker(IDP_OF_LAST_RESORT)
-
-        session['idp_choices'] = [item['id'] for item in idp]
-
-        if len(idp) > 1:
-            return redirect(url_for('.select_idp'))
-
-        session['resolved_idp'] = idp[0].get("id")
-        session['department_name'] = idp[0].get("name")
-
-        return redirect(url_for('.confirm_dept'))
+        return redirect_based_on_email_address(form.email_address.data)
 
     return render_template('views/auth/change_email.html', form=form)
 
@@ -122,24 +110,8 @@ def request_email_address():
 
     if form.validate_on_submit():
 
-        if form.email_known.data:
-
-            session['email_address'] = form.email_address.data
-            idp = idp_from_email_address(form.email_address.data)
-
-            if idp is None:
-                return redirect_to_broker(IDP_OF_LAST_RESORT)
-
-            session['idp_choices'] = [item['id'] for item in idp]
-
-            if len(idp) > 1:
-                return redirect(url_for('.select_idp'))
-
-            session['resolved_idp'] = idp[0].get("id")
-            session['department_name'] = idp[0].get("name")
-
-            return redirect(url_for('.confirm_dept'))
-
+        if form.email_known.data == 'yes':
+            return redirect_based_on_email_address(form.email_address.data)
         else:
             return redirect(url_for('.select_dept'))
 
