@@ -3,7 +3,8 @@
 Handle OIDC authentication requests
 """
 import re
-from flask import redirect, render_template, request, session, url_for, jsonify
+
+from flask import jsonify, redirect, render_template, request, session, url_for
 
 from app.main import main
 from app.main.forms import (
@@ -27,12 +28,12 @@ idp_profiles = [
     {
         'id': 'gds-google',
         'name': 'Government Digital Service',
-        'email_pattern': '@digital.cabinet-office\.'
+        'email_pattern': '^[^@]+@digital\.cabinet-office\.gov\.uk$'
     },
     {
         'id': 'co-digital',
         'name': 'Cabinet Office',
-        'email_pattern': '@cabinetoffice\.'
+        'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$'
     }
 ]
 
