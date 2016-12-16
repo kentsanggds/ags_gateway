@@ -22,5 +22,5 @@
 {% endblock %}
 
 {% block body_end %}
-<meta http-equiv="refresh" content="5; url={{ next_url }}">
+<meta http-equiv="refresh" content="5; url={{ session['auth_redirect'] }}">
 {% endblock %}
