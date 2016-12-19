@@ -2,7 +2,7 @@
 
 {% block main_content %}
 
-  <a href="/" class="link-back">Back</a>
+  <a href="{{ url_for('main.request_email_address', email_address=session["email_address"]) }}" class="link-back">Back</a>
 
 <div id="confirm-dept">
   <h1 class="heading-large text">Confirm the department that you work for</h1>
