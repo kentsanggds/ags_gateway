@@ -101,3 +101,6 @@ environment.sh
 
 # sqlite databases
 *.db
+
+# JetBrains
+.idea
