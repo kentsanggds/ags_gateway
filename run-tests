@@ -5,7 +5,8 @@ import argparse
 from lib.script_utils import virtualenv
 
 
-BASE_TEST_RUNNER_ARGS = ['--eradicate', '--flake8', '--spec']
+BASE_TEST_RUNNER_ARGS = ['--eradicate', '--flake8', '--spec', '--cov=.',
+                         '--cov-report', 'term-missing', '-v']
 
 
 def main():
