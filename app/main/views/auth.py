@@ -193,7 +193,7 @@ def confirm_dept():
     form = DeptConfirmForm()
 
     if form.validate_on_submit():
-        if form.confirm.data:
+        if form.confirm.data == 'yes':
             return redirect(url_for('.to_idp'))
 
         return redirect(url_for('.request_email_address'))
