@@ -40,7 +40,7 @@ idp_profiles = [
     {
         'id': 'ad-saml',
         'name': 'Civil Service Digital',
-        'email_pattern': '^[^@]+@sso\.civilservice\.uk$',
+        'email_pattern': '^[^@]+@sso\.civilservice\.digital$',
         'hint': 'GDS staff in AGS, @sso.civilservice.digital accounts'
     },
 ]
