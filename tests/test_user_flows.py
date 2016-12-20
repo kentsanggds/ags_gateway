@@ -1,6 +1,8 @@
 from flask import session, url_for
 import pytest
 
+from app.main.views.auth import idp_profiles
+
 
 class TestUserFlows(object):
 
@@ -57,9 +59,24 @@ class TestUserFlows(object):
             assert session['email_address'] == data['email_address']
             assert session['suggested_idp'] == 'gds-google'
             assert session['department_name'] == 'Government Digital Service'
-    @pytest.mark.xfail
-    def test_select_idp(self):
-        assert False
+
+    @pytest.mark.parametrize("idp_id", [
+        'gds-google',
+        'co-digital',
+        'ad-saml',
+    ])
+    def test_select_idp(self, app_, idp_id):
+        url = url_for('main.select_idp')
+        data = {
+            'idp': idp_id
+        }
+        with app_.test_client() as c:
+            with c.session_transaction() as sess:
+                sess['idp_choices'] = [item['id'] for item in idp_profiles]
+            assert c.get(url).status_code == 200
+            resp = c.post(url, data=data)
+            assert resp.status_code == 302
+            assert resp.location.endswith('/broker?idp_hint=%s' % idp_id)
 
     @pytest.mark.xfail
     def test_confirm_idp(self):
