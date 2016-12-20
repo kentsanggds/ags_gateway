@@ -43,10 +43,20 @@ class TestUserFlows(object):
             assert resp.status_code == 302
             assert resp.location.endswith(
                 url_for('broker.auth', idp_hint=session['idp_hint']))
-    @pytest.mark.xfail
-    def test_change_email_address(self):
-        assert False
 
+    def test_change_email_address(self, app_):
+        url = url_for('main.change_email_address')
+        data = {
+            'email_address': 'test@digital.cabinet-office.gov.uk'
+        }
+        with app_.test_client() as c:
+            assert c.get(url).status_code == 200
+            resp = c.post(url, data=data)
+            assert resp.status_code == 302
+            assert resp.location.endswith(url_for('main.confirm_dept'))
+            assert session['email_address'] == data['email_address']
+            assert session['suggested_idp'] == 'gds-google'
+            assert session['department_name'] == 'Government Digital Service'
     @pytest.mark.xfail
     def test_select_idp(self):
         assert False
