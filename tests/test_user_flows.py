@@ -46,19 +46,25 @@ class TestUserFlows(object):
             assert resp.location.endswith(
                 url_for('broker.auth', idp_hint=session['idp_hint']))
 
-    def test_change_email_address(self, app_):
+    @pytest.mark.parametrize("email, idp, name", [
+        ('test@digital.cabinet-office.gov.uk', 'gds-google',
+         'Government Digital Service'),
+        ('test.test@cabinetoffice.gov.uk', 'co-digital', 'Cabinet Office'),
+        ('test@sso.civilservice.uk', 'ad-saml', 'Civil Service Digital'),
+    ])
+    def test_change_email_address(self, app_, email, idp, name):
         url = url_for('main.change_email_address')
         data = {
-            'email_address': 'test@digital.cabinet-office.gov.uk'
+            'email_address': email
         }
         with app_.test_client() as c:
             assert c.get(url).status_code == 200
             resp = c.post(url, data=data)
             assert resp.status_code == 302
             assert resp.location.endswith(url_for('main.confirm_dept'))
-            assert session['email_address'] == data['email_address']
-            assert session['suggested_idp'] == 'gds-google'
-            assert session['department_name'] == 'Government Digital Service'
+            assert session['email_address'] == email
+            assert session['suggested_idp'] == idp
+            assert session['department_name'] == name
 
     @pytest.mark.parametrize("idp_id", [
         'gds-google',
