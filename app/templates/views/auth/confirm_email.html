@@ -22,7 +22,7 @@
             <span class="error-message">{{error}}</span>
             {% endfor %}
           </label>
-          {{form.email_address(class_="form-control")}}
+          {{form.email_address(class_="form-control", value=request.args['email_address'])}}
         </div>
 
         <label class="block-label selection-button-radio" for="{{subfields[1].id}}">
