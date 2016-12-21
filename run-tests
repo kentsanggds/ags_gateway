@@ -2,6 +2,7 @@
 
 import argparse
 
+from lib.govuk_assets import install_govuk_assets
 from lib.script_utils import virtualenv
 
 
@@ -58,6 +59,8 @@ def run_once():
 
 if __name__ == '__main__':
     import sys
+
+    install_govuk_assets('app')
 
     with virtualenv():
         sys.exit(main())
