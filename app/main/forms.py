@@ -6,12 +6,6 @@ from wtforms.validators import Email, Optional, Required
 yesno = [('yes', 'Yes'), ('no', 'No')]
 
 
-def coerce_bool(x):
-    if x == 'False':
-        return False
-    return bool(x)
-
-
 class DeptConfirmForm(FlaskForm):
     confirm = RadioField(choices=yesno, default='yes')
 
@@ -32,7 +26,7 @@ class EmailForm(FlaskForm):
 
 
 class IdpConfirmForm(FlaskForm):
-    confirm = RadioField(choices=yesno, coerce=coerce_bool)
+    confirm = RadioField(choices=yesno)
 
 
 class IdpSelectForm(FlaskForm):
