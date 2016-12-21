@@ -4,14 +4,17 @@ import pytest
 from app.main.views.auth import idp_profiles
 
 
+email_idp_name = [
+    ('test@digital.cabinet-office.gov.uk', 'gds-google',
+     'Government Digital Service'),
+    ('test.test@cabinetoffice.gov.uk', 'co-digital', 'Cabinet Office'),
+    ('test@sso.civilservice.uk', 'ad-saml', 'Civil Service Digital'),
+]
+
+
 class TestUserFlows(object):
 
-    @pytest.mark.parametrize("email, idp, name", [
-        ('test@digital.cabinet-office.gov.uk', 'gds-google',
-         'Government Digital Service'),
-        ('test.test@cabinetoffice.gov.uk', 'co-digital', 'Cabinet Office'),
-        ('test@sso.civilservice.uk', 'ad-saml', 'Civil Service Digital'),
-    ])
+    @pytest.mark.parametrize("email, idp, name", email_idp_name)
     def test_confirm_email_address(self, app_, email, idp, name):
         url = url_for('main.request_email_address')
         data = {
@@ -46,12 +49,7 @@ class TestUserFlows(object):
             assert resp.location.endswith(
                 url_for('broker.auth', idp_hint=session['idp_hint']))
 
-    @pytest.mark.parametrize("email, idp, name", [
-        ('test@digital.cabinet-office.gov.uk', 'gds-google',
-         'Government Digital Service'),
-        ('test.test@cabinetoffice.gov.uk', 'co-digital', 'Cabinet Office'),
-        ('test@sso.civilservice.uk', 'ad-saml', 'Civil Service Digital'),
-    ])
+    @pytest.mark.parametrize("email, idp, name", email_idp_name)
     def test_change_email_address(self, app_, email, idp, name):
         url = url_for('main.change_email_address')
         data = {
