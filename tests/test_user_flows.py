@@ -140,9 +140,28 @@ class TestUserFlows(object):
             assert resp.status_code == 302
             assert resp.location.endswith(url_for('main.to_idp'))
 
-    @pytest.mark.xfail
-    def test_confirm_dept(self):
-        assert False
+    @pytest.mark.parametrize("email, idp, name", email_idp_name)
+    def test_confirm_dept(self, app_, email, idp, name):
+        url = url_for('main.confirm_dept')
+        data = {
+            'confirm': 'yes'
+        }
+
+        with app_.test_client() as c:
+            with c.session_transaction() as sess:
+                sess['suggested_idp'] = idp
+                sess["department_name"] = name
+                sess["email_address"] = email
+
+            resp = c.get(url)
+            assert resp.status_code == 200
+            content = str(resp.data)
+            assert email in content
+            assert name in content
+
+            resp = c.post(url, data=data)
+            assert resp.status_code == 302
+            assert resp.location.endswith(url_for('main.to_idp'))
 
     @pytest.mark.xfail
     def test_interstitial_to_idp(self):
