@@ -80,7 +80,8 @@ class TestUserFlows(object):
             assert c.get(url).status_code == 200
             resp = c.post(url, data=data)
             assert resp.status_code == 302
-            assert resp.location.endswith('/broker?idp_hint=%s' % idp_id)
+            assert resp.location.endswith(
+                url_for('broker.auth', idp_hint=idp_id))
 
     @pytest.mark.parametrize("idp_id, choice", [
         ('gds-google', 'yes'),
@@ -108,9 +109,21 @@ class TestUserFlows(object):
                 assert resp.location.endswith(
                     url_for('main.request_email_address'))
 
-    @pytest.mark.xfail
-    def test_select_dept(self):
-        assert False
+    @pytest.mark.parametrize("idp_id", [
+        'gds-google',
+        'co-digital',
+        'ad-saml',
+    ])
+    def test_select_dept(self, app_, idp_id):
+        url = url_for('main.select_dept')
+        data = {
+            'dept': idp_id
+        }
+        with app_.test_client() as c:
+            assert c.get(url).status_code == 200
+            resp = c.post(url, data=data)
+            assert resp.status_code == 302
+            assert resp.location.endswith(url_for('main.to_idp'))
 
     @pytest.mark.xfail
     def test_confirm_dept(self):
