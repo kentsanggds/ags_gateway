@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from flask import session, url_for
 import pytest
 
@@ -13,6 +14,15 @@ email_idp_name = [
 
 
 class TestUserFlows(object):
+
+    def assertMetaRefresh(self, response, sec, url):
+        content = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
+        meta = content.find(
+            'meta',
+            attrs={
+                'http-equiv': 'refresh',
+                'content': '%s; url=%s' % (sec, url)})
+        assert meta is not None
 
     @pytest.mark.parametrize("email, idp, name", email_idp_name)
     def test_confirm_email_address(self, app_, email, idp, name):
@@ -163,10 +173,30 @@ class TestUserFlows(object):
             assert resp.status_code == 302
             assert resp.location.endswith(url_for('main.to_idp'))
 
-    @pytest.mark.xfail
-    def test_interstitial_to_idp(self):
-        assert False
+    @pytest.mark.parametrize("idp_id", [
+        'gds-google',
+        'co-digital',
+        'ad-saml',
+    ])
+    def test_interstitial_to_idp(self, app_, idp_id):
+        url = url_for('main.to_idp')
 
-    @pytest.mark.xfail
-    def test_interstitial_to_service(self):
-        assert False
+        with app_.test_client() as c:
+            with c.session_transaction() as sess:
+                sess['suggested_idp'] = idp_id
+
+            resp = c.get(url)
+            assert resp.status_code == 200
+            self.assertMetaRefresh(resp, 5, url_for('broker.auth',
+                                                    idp_hint=idp_id))
+
+    def test_interstitial_to_service(self, app_):
+        url = url_for('main.to_service')
+
+        with app_.test_client() as c:
+            with c.session_transaction() as sess:
+                sess['auth_redirect'] = '/url'
+
+            resp = c.get(url)
+            assert resp.status_code == 200
+            self.assertMetaRefresh(resp, 5, session['auth_redirect'])
