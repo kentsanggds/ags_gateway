@@ -8,7 +8,7 @@ email_idp_name = [
     ('test@digital.cabinet-office.gov.uk', 'gds-google',
      'Government Digital Service'),
     ('test.test@cabinetoffice.gov.uk', 'co-digital', 'Cabinet Office'),
-    ('test@sso.civilservice.uk', 'ad-saml', 'Civil Service Digital'),
+    ('test@sso.civilservice.digital', 'ad-saml', 'Civil Service Digital'),
 ]
 
 
@@ -33,7 +33,7 @@ class TestUserFlows(object):
     @pytest.mark.parametrize("email", [
         'test@digital.cabinetoffice.gov.uk',
         'test.test@cabinet-office.gov.uk',
-        'test@sso.civilservice.digital',
+        'test@sso.civilservice.uk',
         'test@test.com',
     ])
     def test_confirm_email_address_broker_lookup_redirect(self, app_, email):
