@@ -21,8 +21,10 @@ class TestUserFlows(object):
             'email_known': 'yes',
             'email_address': email
         }
+
         with app_.test_client() as c:
             assert c.get(url).status_code == 200
+
             resp = c.post(url, data=data)
             assert resp.status_code == 302
             assert resp.location.endswith(url_for('main.confirm_dept'))
@@ -42,6 +44,7 @@ class TestUserFlows(object):
             'email_known': 'yes',
             'email_address': email
         }
+
         with app_.test_client() as c:
             resp = c.post(url, data=data)
             assert session['idp_hint'] == 'idp of last resort'
@@ -55,8 +58,10 @@ class TestUserFlows(object):
         data = {
             'email_address': email
         }
+
         with app_.test_client() as c:
             assert c.get(url).status_code == 200
+
             resp = c.post(url, data=data)
             assert resp.status_code == 302
             assert resp.location.endswith(url_for('main.confirm_dept'))
@@ -74,10 +79,13 @@ class TestUserFlows(object):
         data = {
             'idp': idp_id
         }
+
         with app_.test_client() as c:
             with c.session_transaction() as sess:
                 sess['idp_choices'] = [item['id'] for item in idp_profiles]
+
             assert c.get(url).status_code == 200
+
             resp = c.post(url, data=data)
             assert resp.status_code == 302
             assert resp.location.endswith(
@@ -96,15 +104,20 @@ class TestUserFlows(object):
         data = {
             'confirm': choice
         }
+
         with app_.test_client() as c:
             with c.session_transaction() as sess:
                 sess['suggested_idp'] = idp_id
+
             assert c.get(url).status_code == 200
+
             resp = c.post(url, data=data)
             assert resp.status_code == 302
+
             if choice == 'yes':
                 assert resp.location.endswith(
                     url_for('broker.auth', idp_hint=idp_id))
+
             if choice == 'no':
                 assert resp.location.endswith(
                     url_for('main.request_email_address'))
@@ -119,8 +132,10 @@ class TestUserFlows(object):
         data = {
             'dept': idp_id
         }
+
         with app_.test_client() as c:
             assert c.get(url).status_code == 200
+
             resp = c.post(url, data=data)
             assert resp.status_code == 302
             assert resp.location.endswith(url_for('main.to_idp'))
