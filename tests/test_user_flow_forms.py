@@ -8,9 +8,9 @@ class TestUserFlowForms(object):
 
     @pytest.mark.parametrize("value, coerced", [
         ('yes', 'yes'),
-        ('yes', 'yes'),
+        ('no', 'no'),
     ])
-    def test_idp_confirm_form(self, value, coerced):
+    def test_idp_confirm_form(self, app_, value, coerced):
         form = IdpConfirmForm(formdata=MultiDict([('confirm', value)]))
         assert form.confirm.choices == [('yes', 'Yes'), ('no', 'No')]
         assert form.confirm.data == coerced
