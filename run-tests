@@ -60,7 +60,5 @@ def run_once():
 if __name__ == '__main__':
     import sys
 
-    install_govuk_assets('app')
-
     with virtualenv():
         sys.exit(main())
