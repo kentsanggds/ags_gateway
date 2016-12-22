@@ -1,5 +1,6 @@
 from flask import session, url_for
 import mock
+from oic.oic import AuthnToken
 import pytest
 
 
@@ -35,9 +36,40 @@ class TestOIDCClient(object):
 
         assert resp.status_code == 302
 
-    @pytest.mark.xfail
-    def test_send_token_request(self):
-        assert False
+    @mock.patch('app.oidc_client.views._get_userinfo')
+    @mock.patch('oic.oic.Client.parse_response')
+    @mock.patch('oic.oic.Client.do_access_token_request')
+    def test_send_token_request(self, do_access_token_request,
+                                mock_parse_response, mocked_get_userinfo,
+                                app_, client):
+        callback_url = url_for('oidc_callback', _external=True)
+
+        mock_parse_response.return_value = {
+            'state': 'mocked_state',
+            'code': 'mocked_code',
+        }
+
+        do_access_token_request.return_value = {
+            'id_token': AuthnToken(nonce='mocked_nonce', sub='mocked_sub'),
+            'access_token': 'mocked_access_token',
+        }
+
+        with client.session_transaction() as sess:
+            sess['state'] = 'mocked_state'
+            sess['nonce'] = 'mocked_nonce'
+            sess['destination'] = '/mocked_destination'
+
+        resp = client.get(url_for('oidc_callback'))
+
+        do_access_token_request.assert_called_once_with(
+            authn_method='client_secret_basic',
+            request_args={
+                'redirect_uri': callback_url,
+                'code': 'mocked_code'},
+            state='mocked_state')
+
+        assert resp.status_code == 302
+        assert resp.location.endswith('/mocked_destination')
 
     @pytest.mark.xfail
     def test_send_userinfo_request(self):
