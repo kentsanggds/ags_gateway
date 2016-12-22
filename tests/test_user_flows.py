@@ -15,32 +15,29 @@ email_idp_name = [
 
 class TestUserFlows(object):
 
-    def assertMetaRefresh(self, response, sec, url):
+    def assert_meta_refresh(self, response, seconds_delay, url):
         content = BeautifulSoup(response.data.decode('utf-8'), 'html.parser')
         meta = content.find(
             'meta',
             attrs={
                 'http-equiv': 'refresh',
-                'content': '%s; url=%s' % (sec, url)})
+                'content': '{seconds_delay}; url={url}'.format(
+                    seconds_delay=seconds_delay, url=url)})
         assert meta is not None
 
     @pytest.mark.parametrize("email, idp, name", email_idp_name)
-    def test_confirm_email_address(self, app_, email, idp, name):
+    def test_confirm_email_address(self, client, email, idp, name):
         url = url_for('main.request_email_address')
         data = {
             'email_known': 'yes',
             'email_address': email
         }
 
-        with app_.test_client() as c:
-            assert c.get(url).status_code == 200
+        assert client.get(url).status_code == 200
 
-            resp = c.post(url, data=data)
-            assert resp.status_code == 302
-            assert resp.location.endswith(url_for('main.confirm_dept'))
-            assert session['email_address'] == email
-            assert session['suggested_idp'] == idp
-            assert session['department_name'] == name
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(url_for('main.confirm_dept'))
 
     @pytest.mark.parametrize("email", [
         'test@digital.cabinetoffice.gov.uk',
@@ -48,155 +45,137 @@ class TestUserFlows(object):
         'test@sso.civilservice.uk',
         'test@test.com',
     ])
-    def test_confirm_email_address_broker_lookup_redirect(self, app_, email):
+    def test_confirm_email_address_broker_lookup_redirect(self, client, email):
         url = url_for('main.request_email_address')
         data = {
             'email_known': 'yes',
             'email_address': email
         }
 
-        with app_.test_client() as c:
-            resp = c.post(url, data=data)
-            assert session['idp_hint'] == 'idp of last resort'
-            assert resp.status_code == 302
-            assert resp.location.endswith(
-                url_for('broker.auth', idp_hint=session['idp_hint']))
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(
+            url_for('broker.auth', idp_hint=session['idp_hint']))
 
     @pytest.mark.parametrize("email, idp, name", email_idp_name)
-    def test_change_email_address(self, app_, email, idp, name):
+    def test_change_email_address(self, client, email, idp, name):
         url = url_for('main.change_email_address')
         data = {
             'email_address': email
         }
 
-        with app_.test_client() as c:
-            assert c.get(url).status_code == 200
+        assert client.get(url).status_code == 200
 
-            resp = c.post(url, data=data)
-            assert resp.status_code == 302
-            assert resp.location.endswith(url_for('main.confirm_dept'))
-            assert session['email_address'] == email
-            assert session['suggested_idp'] == idp
-            assert session['department_name'] == name
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(url_for('main.confirm_dept'))
 
     @pytest.mark.parametrize("idp_id", [
         'gds-google',
         'co-digital',
         'ad-saml',
     ])
-    def test_select_idp(self, app_, idp_id):
+    def test_select_idp(self, client, idp_id):
         url = url_for('main.select_idp')
         data = {
             'idp': idp_id
         }
 
-        with app_.test_client() as c:
-            with c.session_transaction() as sess:
-                sess['idp_choices'] = [item['id'] for item in idp_profiles]
+        with client.session_transaction() as sess:
+            sess['idp_choices'] = [item['id'] for item in idp_profiles]
 
-            assert c.get(url).status_code == 200
+        assert client.get(url).status_code == 200
 
-            resp = c.post(url, data=data)
-            assert resp.status_code == 302
-            assert resp.location.endswith(
-                url_for('broker.auth', idp_hint=idp_id))
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(
+            url_for('broker.auth', idp_hint=idp_id))
 
-    @pytest.mark.parametrize("idp_id, choice", [
-        ('gds-google', 'yes'),
-        ('co-digital', 'yes'),
-        ('ad-saml', 'yes'),
-        ('gds-google', 'no'),
-        ('co-digital', 'no'),
-        ('ad-saml', 'no'),
+    @pytest.mark.parametrize("idp_id, choice, endpoint, values", [
+        ('gds-google', 'yes', 'broker.auth', {'idp_hint': 'gds-google'}),
+        ('co-digital', 'yes', 'broker.auth', {'idp_hint': 'co-digital'}),
+        ('ad-saml', 'yes', 'broker.auth', {'idp_hint': 'ad-saml'}),
+        ('gds-google', 'no', 'main.request_email_address', {}),
+        ('co-digital', 'no', 'main.request_email_address', {}),
+        ('ad-saml', 'no', 'main.request_email_address', {}),
     ])
-    def test_confirm_idp(self, app_, idp_id, choice):
+    def test_confirm_idp(self, client, idp_id, choice, endpoint, values):
         url = url_for('main.confirm_idp')
         data = {
             'confirm': choice
         }
 
-        with app_.test_client() as c:
-            with c.session_transaction() as sess:
-                sess['suggested_idp'] = idp_id
+        with client.session_transaction() as sess:
+            sess['suggested_idp'] = idp_id
 
-            assert c.get(url).status_code == 200
+        assert client.get(url).status_code == 200
 
-            resp = c.post(url, data=data)
-            assert resp.status_code == 302
-
-            if choice == 'yes':
-                assert resp.location.endswith(
-                    url_for('broker.auth', idp_hint=idp_id))
-
-            if choice == 'no':
-                assert resp.location.endswith(
-                    url_for('main.request_email_address'))
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(url_for(endpoint, **values))
 
     @pytest.mark.parametrize("idp_id", [
         'gds-google',
         'co-digital',
         'ad-saml',
     ])
-    def test_select_dept(self, app_, idp_id):
+    def test_select_dept(self, client, idp_id):
         url = url_for('main.select_dept')
         data = {
             'dept': idp_id
         }
 
-        with app_.test_client() as c:
-            assert c.get(url).status_code == 200
+        assert client.get(url).status_code == 200
 
-            resp = c.post(url, data=data)
-            assert resp.status_code == 302
-            assert resp.location.endswith(url_for('main.to_idp'))
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(url_for('main.to_idp'))
 
     @pytest.mark.parametrize("email, idp, name", email_idp_name)
-    def test_confirm_dept(self, app_, email, idp, name):
+    def test_confirm_dept(self, client, email, idp, name):
         url = url_for('main.confirm_dept')
         data = {
             'confirm': 'yes'
         }
 
-        with app_.test_client() as c:
-            with c.session_transaction() as sess:
-                sess['suggested_idp'] = idp
-                sess["department_name"] = name
-                sess["email_address"] = email
+        with client.session_transaction() as sess:
+            sess['suggested_idp'] = idp
+            sess["department_name"] = name
+            sess["email_address"] = email
 
-            resp = c.get(url)
-            assert resp.status_code == 200
-            content = str(resp.data)
-            assert email in content
-            assert name in content
+        resp = client.get(url)
+        assert resp.status_code == 200
+        content = str(resp.data)
+        assert email in content
+        assert name in content
 
-            resp = c.post(url, data=data)
-            assert resp.status_code == 302
-            assert resp.location.endswith(url_for('main.to_idp'))
+        resp = client.post(url, data=data)
+        assert resp.status_code == 302
+        assert resp.location.endswith(url_for('main.to_idp'))
 
     @pytest.mark.parametrize("idp_id", [
         'gds-google',
         'co-digital',
         'ad-saml',
     ])
-    def test_interstitial_to_idp(self, app_, idp_id):
+    def test_interstitial_to_idp(self, app_, client, idp_id):
         url = url_for('main.to_idp')
 
-        with app_.test_client() as c:
-            with c.session_transaction() as sess:
-                sess['suggested_idp'] = idp_id
+        with client.session_transaction() as sess:
+            sess['suggested_idp'] = idp_id
 
-            resp = c.get(url)
-            assert resp.status_code == 200
-            self.assertMetaRefresh(resp, 5, url_for('broker.auth',
-                                                    idp_hint=idp_id))
+        resp = client.get(url)
+        assert resp.status_code == 200
+        self.assert_meta_refresh(resp, app_.config['META_REFRESH_DELAY'],
+                                 url_for('broker.auth', idp_hint=idp_id))
 
-    def test_interstitial_to_service(self, app_):
+    def test_interstitial_to_service(self, app_, client):
         url = url_for('main.to_service')
 
-        with app_.test_client() as c:
-            with c.session_transaction() as sess:
-                sess['auth_redirect'] = '/url'
+        with client.session_transaction() as sess:
+            sess['auth_redirect'] = '/url'
 
-            resp = c.get(url)
-            assert resp.status_code == 200
-            self.assertMetaRefresh(resp, 5, session['auth_redirect'])
+        resp = client.get(url)
+        assert resp.status_code == 200
+        self.assert_meta_refresh(resp, app_.config['META_REFRESH_DELAY'],
+                                 session['auth_redirect'])

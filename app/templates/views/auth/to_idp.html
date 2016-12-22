@@ -19,5 +19,5 @@
 {% endblock %}
 
 {% block body_end %}
-<meta http-equiv="refresh" content="5; url={{ url_for('broker.auth',idp_hint=session['suggested_idp']) }}">
+<meta http-equiv="refresh" content="{{ config['META_REFRESH_DELAY'] }}; url={{ url_for('broker.auth',idp_hint=session['suggested_idp']) }}">
 {% endblock %}

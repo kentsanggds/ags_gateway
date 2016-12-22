@@ -23,3 +23,9 @@ def app_(request):
 
     request.addfinalizer(teardown)
     return app
+
+
+@pytest.yield_fixture
+def client(app_):
+    with app_.test_client() as c:
+        yield c
