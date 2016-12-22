@@ -19,5 +19,5 @@
 {% endblock %}
 
 {% block body_end %}
-<meta http-equiv="refresh" content="5; url={{ session['auth_redirect'] }}">
+<meta http-equiv="refresh" content="{{ config['META_REFRESH_DELAY'] }}; url={{ session['auth_redirect'] }}">
 {% endblock %}

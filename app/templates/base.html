@@ -21,19 +21,24 @@ information regarding the template.
 
 #}
 
-{% extends "govuk_template/views/layouts/govuk_template.html" %}
+{% if not config['TESTING'] %}
+    {# Do not extend GovUK Template when testing #}
 
-{% block head %}
+    {% extends "govuk_template/views/layouts/govuk_template.html" %}
 
-  {% assets "css_govuk", "css_main" %}
-    <link rel="stylesheet" href="{{ ASSET_URL }}">
-  {% endassets %}
+    {% block head %}
 
-  <script src="/static/js/vendor/jquery/jquery.min.js"></script>
+      {% assets "css_govuk", "css_main" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+      {% endassets %}
 
-  {% block endhead %}{% endblock %}
+      <script src="/static/js/vendor/jquery/jquery.min.js"></script>
 
-{% endblock %}
+      {% block endhead %}{% endblock %}
+
+    {% endblock %}
+
+{% endif -%}
 
 {% block header_class %}with-proposition{% endblock %}
 {% block proposition_header %}
