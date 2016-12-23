@@ -11,25 +11,17 @@ class TestOIDCProvider(object):
 
     @mock.patch('pyop.provider.Provider.parse_authentication_request')
     def test_handle_auth_request(self, mock_parse_authentication_request,
-                                 app_, client):
-        request_params = {
-            'param': 'mock',
-        }
-
-        request_headers = {
-            'Content-Length': '0',
-            'Host': app_.config['SERVER_NAME'],
-            'Content-Type': '',
-        }
+                                 app_, client, request_params,
+                                 request_headers):
 
         mock_parse_authentication_request.return_value = \
-            AuthorizationRequest().deserialize('param=mock')
+            AuthorizationRequest().deserialize(urlencode(request_params))
 
         resp = client.get(url_for('oidc_provider.auth', **request_params),
                           headers=request_headers)
 
         mock_parse_authentication_request.assert_called_once_with(
-            'param=mock',
+            urlencode(request_params),
             request.headers)
 
         assert resp.status_code == 302
