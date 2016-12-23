@@ -48,6 +48,14 @@ class TestOIDCProvider(object):
         assert json.loads(resp.get_data(as_text=True)) == token_response
 
     @pytest.mark.xfail
+    def test_invalid_provider_token_request(self):
+        assert False
+
+    @pytest.mark.xfail
+    def test_oath_error_provider_token_request(self):
+        assert False
+
+    @pytest.mark.xfail
     def test_handle_userinfo_request(self):
         assert False
 
