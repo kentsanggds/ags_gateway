@@ -39,7 +39,7 @@ SECRET_KEY = env.get(
     b'p{\xa7\x18K\rB\x06\xc5\xbdK?\xe5\xdb\xde\x02P\xd0,\x14\xe50\x07\xdd')
 
 # Delay in seconds before redirecting via meta-refresh
-META_REFRESH_DELAY = 5
+META_REFRESH_DELAY = int(env.get('META_REFRESH_DELAY', 5))
 
 # XXX Don't change the following settings unless necessary
 
