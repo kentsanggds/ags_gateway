@@ -60,5 +60,9 @@ def run_once():
 if __name__ == '__main__':
     import sys
 
-    with virtualenv():
-        sys.exit(main())
+    try:
+        with virtualenv():
+            sys.exit(main())
+
+    except KeyboardInterrupt:
+        pass
