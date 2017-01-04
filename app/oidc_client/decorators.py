@@ -49,9 +49,14 @@ def _authentication_request():
             'redirect_uri': client.registration_response['redirect_uris'][0],
             'state': session['state'],
             'nonce': session['nonce'],
-            'kc_idp_hint': session.get('idp_hint', request.args.get('idp_hint')),
+            'kc_idp_hint': session.get(
+                'idp_hint', request.args.get('idp_hint')),
             'login_hint': session.get('email_address'),
             'claims': {
+                'id_token': {
+                    'email': None,
+                    'name': None
+                },
                 'userinfo': {
                     'email': {'essential': True},
                     'name': {'essential': True}
