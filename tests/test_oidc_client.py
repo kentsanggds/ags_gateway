@@ -27,6 +27,10 @@ class TestOIDCClient(object):
             'kc_idp_hint': 'mock_idp_hint',
             'login_hint': 'mock_email_address',
             'claims': {
+                'id_token': {
+                    'email': None,
+                    'name': None
+                },
                 'userinfo': {
                     'email': {'essential': True},
                     'name': {'essential': True}

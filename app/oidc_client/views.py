@@ -79,4 +79,20 @@ def _get_userinfo(id_token, state):
         raise ValueError(
             "The userinfo 'sub' does not match the id token 'sub'")
 
+    if 'email' not in userinfo:
+        current_app.logger.warn('IDP did not supply email claim in userinfo')
+
+        if 'email' in id_token:
+            userinfo['email'] = id_token['email']
+
+        else:
+            current_app.logger.warn(
+                'IDP did not supply email claim in id token')
+
+            if 'email_address' in session:
+                userinfo['email'] = session['email_address']
+
+            else:
+                current_app.logger.warn('User email address unknown')
+
     return userinfo
