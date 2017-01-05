@@ -11,7 +11,7 @@
 
         {% with subfields=form.email_known|list %}
         <label class="block-label selection-button-radio" for="{{subfields[0].id}}">
-          {{subfields[0](aria_controls="know-email", aria_expanded="true")}}
+          {{subfields[0](aria_controls="know-email")}}
           {{subfields[0].label}}
         </label>
         <div class="panel panel-border-narrow sub-selection-input{% if form.email_address.errors %} error{% endif %}" id="know-email" aria-hidden="false">
