@@ -20,7 +20,7 @@
       <li class="next">
         <a href="{{ url_for('broker.auth',idp_hint=session['suggested_idp']) }}">
           <span class="pagination-label">Continue</span>
-          <span class="pagination-text">If this doesn't redirect in 5 seconds click here</span>
+          <span class="pagination-text">If this doesn't redirect in {{ config['META_REFRESH_DELAY'] }} seconds click here</span>
         </a>
       </li>
     </ul>
