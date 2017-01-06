@@ -30,28 +30,6 @@
 {% endblock %}
 
 {% block body_end %}
-<meta http-equiv="refresh" content="{{ config['META_REFRESH_DELAY'] }}; url={{ url_for('broker.auth',idp_hint=session['suggested_idp']) }}">
-<script type="text/javascript">
-  ;(function ($, window) {
-    "use strict"
-
-    $(function() {
-      var counter = {{ config['META_REFRESH_DELAY'] }};
-      var $secondEl = $(".redirect-timer");
-      var timer;
-
-      timer = setInterval(function() {
-          counter--;
-          if(counter < 0) {
-              clearInterval( timer );
-          } else if (counter == 1) {
-            $secondEl.text("1 second");
-          } else {
-              $secondEl.text(counter + " seconds");
-          }
-      }, 1000);
-    });
-
-  }).call(this, jQuery, window);
-</script>
+  <meta http-equiv="refresh" content="{{ config['META_REFRESH_DELAY'] }}; url={{ url_for('broker.auth',idp_hint=session['suggested_idp']) }}">
+  {% include '/includes/redirect.html' %}
 {% endblock %}
