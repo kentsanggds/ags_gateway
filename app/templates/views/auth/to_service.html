@@ -15,9 +15,21 @@
 
   </div>
 
+  <div class="pagination">
+    <ul>
+      <li class="next">
+        <a href="{{ session['auth_redirect'] }}">
+          <span class="pagination-label">Continue</span>
+          <span class="pagination-text">If this doesn't redirect in <span class="redirect-timer">{{ config['META_REFRESH_DELAY'] }} seconds</span> click here</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
 </main>
 {% endblock %}
 
 {% block body_end %}
-<meta http-equiv="refresh" content="{{ config['META_REFRESH_DELAY'] }}; url={{ session['auth_redirect'] }}">
+  <meta http-equiv="refresh" content="{{ config['META_REFRESH_DELAY'] }}; url={{ session['auth_redirect'] }}">
+  {% include '/includes/redirect.html' %}
 {% endblock %}
