@@ -20,7 +20,7 @@ class ChangeEmailForm(FlaskForm):
 
 
 class EmailForm(FlaskForm):
-    email_known = RadioField(choices=yesno, default='yes')
+    email_known = RadioField(choices=yesno)
     email_address = EmailField('Email', validators=[
         Optional(), Email()])
 
