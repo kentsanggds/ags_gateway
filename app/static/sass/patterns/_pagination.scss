@@ -1,0 +1,90 @@
+// Pagintation
+// ==========================================================================
+
+// Mixin for producing left and right arrows of pagination component
+// Example usage:
+
+// &.previous {
+//  @include pagination-arrow("left");
+// }
+@mixin pagination-arrow($direction) {
+  @if $direction == "right" {
+    float: right;
+    text-align: right;
+    a {
+      padding-right: $gutter;
+    }
+    &:before {
+      background: transparent url(/static/images/arrow-sprite-govuk.png) no-repeat -102px -11px;
+      margin: 0;
+      display: block;
+      float: right;
+      width: 30px;
+      height: 38px;
+      content: " ";
+    }
+  } @else {
+    float: left;
+    a {
+      padding-left: $gutter;
+    }
+    &:before {
+      background: transparent url(/static/images/arrow-sprite-govuk.png) no-repeat -20px -11px;
+      margin: 0;
+      display: block;
+      float: left;
+      width: 30px;
+      height: 38px;
+      content: " ";
+    }
+  }
+
+}
+
+.pagination {
+  @extend %contain-floats;
+  margin-top: $gutter-half;
+  ul {
+    list-style: none;
+  }
+  li {
+    box-sizing: border-box;
+    padding: 0;
+    position: relative;
+    width: 49%;
+
+    a {
+      @include link-colours($link-colour, $link-hover-colour);
+      display: block;
+      text-decoration: none;
+
+      &:hover {
+        background-color: #f8f8f8;
+      }
+    }
+
+    span {
+      display: block;
+    }
+
+    .pagination-label {
+      text-decoration: none;
+      @include media(tablet) {
+        font-size: 27px;
+        line-height: 40px;
+      }
+    }
+
+    .pagination-text {
+      text-decoration: underline;
+    }
+
+    &.previous {
+      @include pagination-arrow("left");
+    }
+    &.next {
+      @include pagination-arrow("right");
+    }
+
+  }
+}

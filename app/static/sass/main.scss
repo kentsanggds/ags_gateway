@@ -1,10 +1,14 @@
 @import "../govuk_elements/public/sass/main.scss";
+
+@import "base/helpers.scss";
+
 @import "patterns/product-page.scss";
 @import "patterns/search.scss";
 @import "main/main.scss";
 
 @import "patterns/service-explanation-box.scss";
 
+@import "patterns/pagination.scss";
 
 $gutter-third: $gutter / 3;
 
@@ -209,4 +213,8 @@ html, body {
     padding-left: (35 + 30) + px;
     margin-left: -$gutter-half;
   }
+}
+
+.pagination li .redirect-timer {
+  display: inline;
 }
