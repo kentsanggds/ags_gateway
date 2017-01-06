@@ -1,10 +1,14 @@
 @import "../govuk_elements/public/sass/main.scss";
+
+@import "base/helpers.scss";
+
 @import "patterns/product-page.scss";
 @import "patterns/search.scss";
 @import "main/main.scss";
 
 @import "patterns/service-explanation-box.scss";
 
+@import "patterns/pagination.scss";
 
 $gutter-third: $gutter / 3;
 
