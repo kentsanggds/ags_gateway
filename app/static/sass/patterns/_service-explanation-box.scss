@@ -8,7 +8,7 @@
   box-sizing: border-box;
   color: $page-colour;
   width: 100%;
-  padding: 60px 70px;
+  padding: 75px 70px;
 
   .panel {
     border-color: $page-colour;
@@ -21,8 +21,4 @@
   img {
     max-width: 100%;
   }
-}
-
-.panel-content {
-  padding-top: $gutter-half;
 }
