@@ -21,25 +21,22 @@ information regarding the template.
 
 #}
 
-{% if not config['TESTING'] %}
-    {# Do not extend GovUK Template when testing #}
+{# Do not extend GovUK Template when testing #}
 
-    {% extends "govuk_template/views/layouts/govuk_template.html" %}
+{% extends "govuk_template/views/layouts/govuk_template.html" %}
 
     {% block head %}
       {% include "includes/ga.html" %}
 
-      {% assets "css_govuk", "css_main" %}
-        <link rel="stylesheet" href="{{ ASSET_URL }}">
-      {% endassets %}
+  {% assets "css_govuk", "css_main" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
 
-      <script src="/static/js/vendor/jquery/jquery.min.js"></script>
+  <script src="/static/js/vendor/jquery/jquery.min.js"></script>
 
-      {% block endhead %}{% endblock %}
+  {% block endhead %}{% endblock %}
 
-    {% endblock %}
-
-{% endif -%}
+{% endblock %}
 
 {% block header_class %}with-proposition{% endblock %}
 {% block proposition_header %}
