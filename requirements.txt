@@ -15,6 +15,7 @@ pytest-flake8
 pytest-flask
 pytest-mock
 pytest-spec
+pytest-splinter
 pytest-watch
 waitress
 Werkzeug
