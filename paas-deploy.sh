@@ -2,6 +2,8 @@
 export CF_HOME="$(mktemp -d)"
 trap 'rm -r $CF_HOME' EXIT
 
+APPNAME="ags-gateway-aws"
+
 cf api https://api.cloud.service.gov.uk
 
 # Note: the actual name of the environment variable is determined
@@ -9,7 +11,12 @@ cf api https://api.cloud.service.gov.uk
 cf auth "$CF_USER" "$CF_PASSWORD"
 
 cf target -o csd-sso -s sandbox
-cf push ags-gateway-aws
+cf push $APPNAME
+cf set-env $APPNAME OIDC_CLIENT_ID "$OIDC_CLIENT_ID"
+cf set-env $APPNAME OIDC_CLIENT_SECRET "$OIDC_CLIENT_SECRET"
+cf set-env $APPNAME OIDC_CLIENT_ISSUER "$OIDC_CLIENT_ISSUER"
+cf set-env $APPNAME SERVER_NAME "$SERVER_NAME"
+cf restage $APPNAME
 
 # Destroy token
 cf logout
