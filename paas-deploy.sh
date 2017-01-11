@@ -8,7 +8,7 @@ cf api https://api.cloud.service.gov.uk
 # by what you enter into the Credentials Binding Plugin
 cf auth "$CF_USER" "$CF_PASSWORD"
 
-cf target -o myorg -s myspace
+cf target -o csd-sso -s sandbox
 cf push ags-gateway-aws
 
 # Destroy token
