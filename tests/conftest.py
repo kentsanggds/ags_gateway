@@ -4,16 +4,16 @@ import pytest
 from app.factory import create_app
 
 
-def _provider_config(*args, **kwargs):
-    pass
-
-
 @pytest.fixture(scope='session')
 def app(request):
-    with mock.patch('oic.oic.Client.provider_config', _provider_config):
-        app = create_app()
-    app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
+    app = create_app(**{
+        'TESTING': True,
+        'WTF_CSRF_ENABLED': False,
+        'OIDC_CLIENT': {
+            'issuer': 'https://example.com',
+            'client_id': 'test-client',
+            'client_secret': 'test-secret'},
+    })
 
     ctx = app.app_context()
     ctx.push()
