@@ -21,6 +21,7 @@ IDP_OF_LAST_RESORT = 'idp of last resort'
 idp_names = {
     'gds-google': 'Government Digital Service',
     'co-digital': 'Cabinet Office',
+    'ccs': 'Crown Commercial Service',
     'ad-saml': 'Azure AD SAML2',
 }
 
@@ -36,6 +37,12 @@ idp_profiles = [
         'name': 'Cabinet Office',
         'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$',
         'hint': 'CO staff on the Official platform. @cabinet-office.gov.uk accounts only.'
+    },
+    {
+        'id': 'co-digital',
+        'name': 'Crown Commercial Service',
+        'email_pattern': '^[^@]+@crowncommercial\.gov\.uk$',
+        'hint': 'CCS staff, @crowncommercial.gov.uk accounts'
     },
     {
         'id': 'ad-saml',
@@ -184,7 +191,8 @@ def search_dept():
     search_term = request.args.get('search_term', 0, type=str)
     return jsonify([
         {'id': 'GDS', 'descr': 'Government Digital Services'},
-        {'id': 'CO', 'descr': 'Cabinet Office'}
+        {'id': 'CO', 'descr': 'Cabinet Office'},
+        {'id': 'CCS', 'descr': 'Crown Commercial Service'},
     ])
 
 
