@@ -1,4 +1,4 @@
 ---
 applications:
 - name: ags-gateway
-  memory: 512M
+  memory: 128M
