@@ -21,24 +21,35 @@ IDP_OF_LAST_RESORT = 'idp of last resort'
 idp_names = {
     'gds-google': 'Government Digital Service',
     'co-digital': 'Cabinet Office',
+    'ccs': 'Crown Commercial Service',
     'ad-saml': 'Azure AD SAML2',
 }
 
 idp_profiles = [
     {
         'id': 'gds-google',
+        'idp_name': 'gds-google',
         'name': 'Government Digital Service',
         'email_pattern': '^[^@]+@digital\.cabinet-office\.gov\.uk$',
         'hint': 'All @digital.cabinet-office.gov.uk accounts'
     },
     {
         'id': 'co-digital',
+        'idp_name': 'co-digital',
         'name': 'Cabinet Office',
         'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$',
         'hint': 'CO staff on the Official platform. @cabinet-office.gov.uk accounts only.'
     },
     {
+        'id': 'ccs',
+        'idp_name': 'co-digital',
+        'name': 'Crown Commercial Service',
+        'email_pattern': '^[^@]+@crowncommercial\.gov\.uk$',
+        'hint': 'CCS staff, @crowncommercial.gov.uk accounts'
+    },
+    {
         'id': 'ad-saml',
+        'idp_name': 'ad-saml',
         'name': 'Civil Service Digital',
         'email_pattern': '^[^@]+@sso\.civilservice\.digital$',
         'hint': 'GDS staff in AGS, @sso.civilservice.digital accounts'
@@ -77,7 +88,7 @@ def redirect_based_on_email_address(email_address):
         session['idp_choices'] = [item['id'] for item in idp]
         return redirect(url_for('.select_idp'))
 
-    session['suggested_idp'] = idp[0]['id']
+    session['suggested_idp'] = idp[0]['idp_name']
     session['department_name'] = idp[0]['name']
 
     return redirect(url_for('.confirm_dept'))
@@ -166,7 +177,7 @@ def confirm_idp():
 def select_dept():
 
     form = DeptSelectForm()
-    form.dept.choices = [(d['id'], "{}|{}".format(d['name'], d['hint']))
+    form.dept.choices = [(d['idp_name'], "{}|{}".format(d['name'], d['hint']))
                          for d in idp_profiles]
 
     if form.validate_on_submit():
@@ -184,7 +195,8 @@ def search_dept():
     search_term = request.args.get('search_term', 0, type=str)
     return jsonify([
         {'id': 'GDS', 'descr': 'Government Digital Services'},
-        {'id': 'CO', 'descr': 'Cabinet Office'}
+        {'id': 'CO', 'descr': 'Cabinet Office'},
+        {'id': 'CCS', 'descr': 'Crown Commercial Service'},
     ])
 
 
