@@ -2,8 +2,6 @@
 export CF_HOME="$(mktemp -d)"
 trap 'rm -r $CF_HOME' EXIT
 
-APPNAME="ags-gateway-aws"
-
 cf api https://api.cloud.service.gov.uk
 
 # Note: the actual name of the environment variable is determined
