@@ -31,7 +31,15 @@ node {
 
         stage("Unit tests") {
             ansiColor("xterm") {
-                sh "venv/bin/pytest --eradicate --flake8 --cov-report xml --cov=app --junitxml=results.xml --pyargs tests || true"
+                try {
+                    sh "venv/bin/pytest --eradicate --flake8 --cov-report xml --cov=app --junitxml=results.xml --pyargs tests || true"
+                } catch(err) {
+                    junit 'results.xml'
+                    if (currentBuild.result == 'UNSTABLE') {
+                        currentBuild.result = 'FAILURE'
+                    }
+                    throw err
+                }
                 junit 'results.xml'
             }
         }
@@ -39,16 +47,16 @@ node {
     }
 
     stage("Deploy") {
-        withCredentials([
-            usernamePassword(credentialsId: 'f8b4788a-0383-4c2a-ba4f-64415628debb', usernameVariable: 'CF_USER', passwordVariable: 'CF_PASSWORD'),
-            file(credentialsId: 'environment.sh', variable: 'ENV_FILE')]) {
-                withEnv(["CF_APPNAME=ags-gateway-${BRANCH_NAME.replace('_', '-')}"]) {
-                    ansiColor("xterm") {
-                        sh "./deploy-to-paas"
-                    }
-                    slackSend color: '#78b037', "Deployed Gateway to https://ags-gateway-${BRANCH_NAME.replace('_', '-')}.cloudapps.digital"
-                }
+        withEnv(["CF_APPNAME=ags-gateway-${BRANCH_NAME.replace('_', '-')}"]) {
+            withCredentials([
+                usernamePassword(credentialsId: 'f8b4788a-0383-4c2a-ba4f-64415628debb', usernameVariable: 'CF_USER', passwordVariable: 'CF_PASSWORD'),
+                file(credentialsId: 'environment.sh', variable: 'ENV_FILE')]) {
+                        ansiColor("xterm") {
+                            sh "./deploy-to-paas"
+                        }
             }
+            slackSend color: '#78b037', "Deployed Gateway to https://${CF_APPNAME}.cloudapps.digital"
+        }
     }
 
 }
