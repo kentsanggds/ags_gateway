@@ -55,7 +55,7 @@ node {
                             sh "./deploy-to-paas"
                         }
             }
-            slackSend color: '#78b037', "Deployed Gateway to https://${CF_APPNAME}.cloudapps.digital"
+            slackSend(color: '#78b037', message: "Deployed Gateway to https://${CF_APPNAME}.cloudapps.digital")
         }
     }
 
