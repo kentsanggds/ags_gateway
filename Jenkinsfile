@@ -46,7 +46,7 @@ node {
                     ansiColor("xterm") {
                         sh "./deploy-to-paas"
                     }
-                    slackSend color: '#78b037' "Deployed Gateway to https://ags-gateway-${BRANCH_NAME.replace('_', '-')}.cloudapps.digital"
+                    slackSend color: '#78b037', "Deployed Gateway to https://ags-gateway-${BRANCH_NAME.replace('_', '-')}.cloudapps.digital"
                 }
             }
     }
