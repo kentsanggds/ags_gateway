@@ -32,7 +32,7 @@ node {
         stage("Unit tests") {
             ansiColor("xterm") {
                 try {
-                    sh "venv/bin/pytest --eradicate --flake8 --cov-report xml --cov=app --junitxml=results.xml --pyargs tests || true"
+                    sh "venv/bin/pytest --eradicate --flake8 --cov-report xml --cov=app --junitxml=results.xml --pyargs tests"
                 } catch(err) {
                     junit 'results.xml'
                     if (currentBuild.result == 'UNSTABLE') {
