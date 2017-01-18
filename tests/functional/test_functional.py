@@ -3,7 +3,7 @@ from flask import url_for
 from selenium.webdriver.common.keys import Keys
 
 
-class TestIntegration(object):
+class TestFunctional(object):
 
     def test_can_show_email_confirmation(self, live_server, browser):
         browser.visit(url_for('main.request_email_address', _external=True))
@@ -17,7 +17,8 @@ class TestIntegration(object):
             self, live_server, browser):
         browser.visit(url_for('main.request_email_address', _external=True))
 
-        browser.choose('email_known', 'yes')
+        browser.execute_script(
+            '$("#content > form > div:nth-child(2) > fieldset > label.block-label.selection-button-radio.selected").addClass("selected");')
 
         browser.is_element_present_by_css(
             "#email_address", wait_time=0.1)
