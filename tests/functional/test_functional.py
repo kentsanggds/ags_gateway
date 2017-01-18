@@ -22,7 +22,10 @@ class TestFunctional(object):
 
         browser.find_by_xpath(
             '//*[@id="content"]/form/div[3]/button').click()
+
         assert browser.is_text_present(
             'Email address you provided')
         assert browser.is_text_present(
             'some.one@digital.cabinet-office.gov.uk')
+        assert browser.is_text_present(
+            'Do you work for the Government Digital Service?')
