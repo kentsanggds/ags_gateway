@@ -17,8 +17,7 @@ class TestFunctional(object):
             self, live_server, browser):
         browser.visit(url_for('main.request_email_address', _external=True))
 
-        browser.execute_script(
-            '$("#content > form > div:nth-child(2) > fieldset > label.block-label.selection-button-radio.selected").addClass("selected");')
+        browser.choose('email_known', 'yes')
 
         browser.is_element_present_by_css(
             "#email_address", wait_time=0.1)
