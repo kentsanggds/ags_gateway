@@ -27,6 +27,7 @@ information regarding the template.
     {% extends "govuk_template/views/layouts/govuk_template.html" %}
 
     {% block head %}
+      {% include "includes/ga.html" %}
 
       {% assets "css_govuk", "css_main" %}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
