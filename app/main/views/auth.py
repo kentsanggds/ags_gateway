@@ -4,7 +4,15 @@ Handle OIDC authentication requests
 """
 import re
 
-from flask import jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    current_app,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for
+)
 
 from app.main import main
 from app.main.forms import (
@@ -47,6 +55,14 @@ idp_profiles = [
         'email_pattern': '^[^@]+@crowncommercial\.gov\.uk$',
         'hint': 'CCS staff, @crowncommercial.gov.uk accounts'
     },
+# csc.gov.uk
+# csep.gov.uk
+# cslearning.gov.uk
+# dexeu.gov.uk
+# ipa.gov.uk
+# odandd.gov.uk
+# orcl.gov.uk
+# pco.gov.uk
     {
         'id': 'ad-saml',
         'idp_name': 'ad-saml',
@@ -181,8 +197,14 @@ def select_dept():
                          for d in idp_profiles]
 
     if form.validate_on_submit():
+
         if form.dept.data:
             session['suggested_idp'] = form.dept.data
+
+            if current_app.config.get('DISABLE_INTERSTITIALS'):
+                return redirect(
+                    url_for('broker.auth', idp_hint=session['suggested_idp']))
+
             return redirect(url_for('.to_idp'))
 
         return redirect_to_broker(IDP_OF_LAST_RESORT)
@@ -206,6 +228,11 @@ def confirm_dept():
 
     if form.validate_on_submit():
         if form.confirm.data == 'yes':
+
+            if current_app.config.get('DISABLE_INTERSTITIALS'):
+                return redirect(
+                    url_for('broker.auth', idp_hint=session['suggested_idp']))
+
             return redirect(url_for('.to_idp'))
 
         return redirect(url_for('.request_email_address'))
