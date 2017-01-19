@@ -8,7 +8,6 @@ BASE_TEST_RUNNER_ARGS = [
     '--eradicate',
     '--flake8',
     '--spec',
-    '--junitxml=log/ags_gateway.log',
 ]
 
 
