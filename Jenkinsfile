@@ -1,5 +1,8 @@
 #!groovy
 
+def success = '#78b037'
+def fail = '#D54C53'
+
 node {
 
     stage("Source") {
@@ -43,14 +46,18 @@ node {
     }
 
     stage("Deploy") {
-        def app_name = "ags-gateway-${BRANCH_NAME.replace('_', '-')}"
+        def app_name = "ags-gateway"
 
-        if (BRANCH_NAME == 'master') {
-            app_name = "ags-gateway"
+        if (BRANCH_NAME != 'master') {
+            app_name = "${app_name}-${BRANCH_NAME.replace('_', '-')}"
         }
 
         deployToPaaS(app_name)
-        slackSend(color: '#78b037', message: "Deployed ${BRANCH_NAME} branch of Gateway to https://${app_name}.cloudapps.digital")
+
+        if (BRANCH_NAME == 'master') {
+            def url = "https://${app_name}.cloudapps.digital"
+            slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
+        }
     }
 }
 
@@ -66,6 +73,10 @@ def runTests(path) {
 
             if (currentBuild.result == 'UNSTABLE') {
                 currentBuild.result = 'FAILURE'
+            }
+
+            if (BRANCH_NAME == 'master') {
+                slackSend(color: fail, message: "${path.capitalize()} tests failed on ${BRANCH_NAME} branch of Gateway")
             }
 
             throw err
