@@ -52,19 +52,19 @@ def oidc_rp(
         yield rp
 
 
-class TestOIDCProvider(object):
+class WhenActingAsOIDCProvider(object):
 
-    def test_handle_provider_config(self, oidc_rp, client):
+    def it_publishes_openid_config_at_a_well_known_url(self, oidc_rp, client):
         response = client.get(url_for('oidc_provider.provider_config'))
         assert response.status_code == 200
         assert 'authorization_endpoint' in response.json
 
-    def test_handle_authorization_request(self, oidc_rp, client):
+    def it_responds_to_authorization_requests(self, oidc_rp, client):
         response = client.get(oidc_rp.auth_request(), follow_redirects=True)
         assert response.status_code == 200
         assert 'Do you know your work email' in response.get_data(as_text=True)
 
-    def test_make_callback(self, oidc_rp, client):
+    def it_redirects_to_the_rp_callback_url(self, oidc_rp, client):
 
         # client request authentication
         response = client.get(oidc_rp.auth_request(), follow_redirects=True)
@@ -79,7 +79,7 @@ class TestOIDCProvider(object):
         assert response.status_code == 302
         assert 'code=' in response.location
 
-    def test_handle_token_and_userinfo_request(self, oidc_rp, client, app):
+    def it_responds_to_token_and_userinfo_requests(self, oidc_rp, client, app):
 
         # client request authentication
         response = client.get(oidc_rp.auth_request(), follow_redirects=True)
@@ -103,21 +103,13 @@ class TestOIDCProvider(object):
         assert 'email' in userinfo
 
     @pytest.mark.xfail
-    def test_invalid_provider_token_request(self):
+    def it_rejects_invalid_token_requests(self):
         assert False
 
     @pytest.mark.xfail
-    def test_oath_error_provider_token_request(self):
+    def it_returns_requested_userinfo_claims(self):
         assert False
 
     @pytest.mark.xfail
-    def test_handle_userinfo_request(self):
-        assert False
-
-    @pytest.mark.xfail
-    def test_userinfo_requested_claims(self):
-        assert False
-
-    @pytest.mark.xfail
-    def test_handle_end_session_request(self):
+    def it_responds_to_end_session_requests(self):
         assert False

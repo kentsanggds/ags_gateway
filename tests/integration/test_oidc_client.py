@@ -5,9 +5,9 @@ import pytest
 import requests
 
 
-class TestOIDCClient(object):
+class WhenActingAsAnOIDCClient(object):
 
-    def test_authenticate(self, provider, client):
+    def it_follows_the_authorization_code_flow(self, provider, client):
         assert provider.openid_configuration.called
 
         response = client.get(url_for('broker.auth'))
@@ -20,7 +20,7 @@ class TestOIDCClient(object):
         assert provider.token_endpoint.called
         assert provider.userinfo_endpoint.called
 
-    def test_idp_hint_passed(self, provider, client):
+    def it_passes_an_idp_hint(self, provider, client):
 
         with client.session_transaction() as session:
             session['idp_hint'] = 'test-idp'
@@ -29,7 +29,7 @@ class TestOIDCClient(object):
 
         assert 'kc_idp_hint=test-idp' in response.location
 
-    def test_login_hint_passed(self, provider, client):
+    def it_passes_a_login_hint(self, provider, client):
 
         email = 'test@example.com'
 
@@ -42,6 +42,6 @@ class TestOIDCClient(object):
         assert login_hint in response.location
 
     @pytest.mark.skip
-    def test_sign_out(self, provider, client):
+    def it_ends_the_provider_session_on_logout(self, provider, client):
         client.get(url_for('oidc_provider.logout'))
         assert provider.end_session_endpoint.called
