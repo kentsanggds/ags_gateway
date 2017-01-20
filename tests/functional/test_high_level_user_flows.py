@@ -17,6 +17,7 @@ class When_on_confirm_email_with_yes_selected_and_valid_email(object):
 
         browser.find_by_css('form button').click()
 
+        assert browser.url == url_for('main.confirm_dept', _external=True)
         assert browser.find_by_css(
             '#confirm-dept > div > div').value == email_address
         assert department in browser.find_by_css(
