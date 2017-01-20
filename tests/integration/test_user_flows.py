@@ -54,7 +54,6 @@ class TestUserFlows(object):
 
         resp = client.post(url_for('main.request_email_address'), data=data)
         assert resp.status_code == 302
-        print(session)
         assert resp.location.endswith(
             url_for('broker.auth', idp_hint=session['idp_hint']))
 

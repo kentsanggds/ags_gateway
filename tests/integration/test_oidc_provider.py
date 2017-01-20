@@ -1,4 +1,6 @@
-from flask import url_for
+import mock
+
+from flask import redirect as flask_redirect, session, url_for
 import pytest
 import requests
 
@@ -6,12 +8,48 @@ from tests.oidc_testbed import MockOIDCClient
 
 
 @pytest.yield_fixture
-def oidc_rp(responses, app, client):
+def skip_idp_interstitial(client):
+
+    with mock.patch('app.main.views.auth.redirect') as redirect:
+
+        def skip_interstitial(url, *args, **kwargs):
+
+            if url == url_for('main.to_idp'):
+                idp = session.get('suggested_idp')
+                url = url_for('broker.auth', idp_hint=idp)
+
+            return flask_redirect(url, *args, **kwargs)
+
+        redirect.side_effect = skip_interstitial
+
+        yield redirect
+
+
+@pytest.yield_fixture
+def skip_service_interstitial(client):
+
+    with mock.patch('app.broker.redirect') as redirect:
+
+        def skip_interstitial(url, *args, **kwargs):
+
+            if url == url_for('main.to_service'):
+                url = session.get('auth_redirect')
+
+            return flask_redirect(url, *args, **kwargs)
+
+        redirect.side_effect = skip_interstitial
+
+        yield redirect
+
+
+@pytest.yield_fixture
+def oidc_rp(
+        responses, app, client, skip_idp_interstitial,
+        skip_service_interstitial):
+
     issuer = url_for('main.index', _external=True)
-    app.config['DISABLE_INTERSTITIALS'] = True
     with MockOIDCClient(responses, issuer, client) as rp:
         yield rp
-    app.config['DISABLE_INTERSTITIALS'] = False
 
 
 class TestOIDCProvider(object):
