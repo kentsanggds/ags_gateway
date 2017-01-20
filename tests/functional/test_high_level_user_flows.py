@@ -24,6 +24,18 @@ class When_on_confirm_email_with_yes_selected_and_valid_email(object):
             '#confirm-dept > h2').value
 
 
+class When_on_confirm_email_with_no_selected(object):
+
+    def it_goes_to_select_department_when_continue_clicked(
+            self, live_server, browser):
+        browser.visit(url_for('main.request_email_address', _external=True))
+
+        browser.choose('email_known', 'no')
+        browser.find_by_css('form button').click()
+
+        assert browser.url == url_for('main.select_dept', _external=True)
+
+
 class When_first_visiting_confirm_email(object):
 
     def it_does_not_show_email_textbox(self, live_server, browser):
@@ -41,7 +53,6 @@ class When_first_visiting_confirm_email(object):
             self, live_server, browser):
 
         browser.visit(url_for('main.request_email_address', _external=True))
-
         browser.find_by_css('form button').click()
 
         assert browser.url == url_for(
