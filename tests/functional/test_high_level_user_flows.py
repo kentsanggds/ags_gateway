@@ -1,17 +1,15 @@
 import pytest
 from flask import url_for
 
+email_depts = [('some.one@digital.cabinet-office.gov.uk',
+                'Government Digital Service')]
 
-email_depts = [
-    ('some.one@digital.cabinet-office.gov.uk', 'Government Digital Service')]
 
-
-class TestUserFlowsFromEmailConfirmation(object):
+class When_on_confirm_email_with_yes_selected_and_valid_email(object):
 
     @pytest.mark.parametrize("email_address,department", email_depts)
-    def test_select_yes_then_enters_email_then_click_to_department_confirm(
+    def it_goes_to_department_confirm_when_continue_clicked(
             self, live_server, browser, email_address, department):
-
         browser.visit(url_for('main.request_email_address', _external=True))
 
         browser.choose('email_known', 'yes')
