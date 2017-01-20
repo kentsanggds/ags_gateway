@@ -52,7 +52,9 @@ node {
             app_name = "${app_name}-${BRANCH_NAME.replace('_', '-')}"
         }
 
-        deployToPaaS(app_name)
+        retry(2) {
+            deployToPaaS(app_name)
+        }
 
         if (BRANCH_NAME == 'master') {
             def url = "https://${app_name}.cloudapps.digital"
