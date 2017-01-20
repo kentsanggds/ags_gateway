@@ -57,3 +57,27 @@ class When_first_visiting_confirm_email(object):
 
         assert browser.url == url_for(
             'main.request_email_address', _external=True)
+
+
+class When_first_visiting_confirm_department(object):
+    
+    def it_has_yes_selected(self, live_server, browser):
+        browser.visit(url_for('main.confirm_dept', _external=True))
+
+        assert browser.find_by_css('#confirm-0').checked
+
+    @pytest.mark.xfail
+    def it_has_correct_department_for_email(self, live_server, browser):
+
+        assert False
+
+    @pytest.mark.xfail
+    def it_goes_to_idp_interstitial_when_continue_clicked(
+            self, live_server, browser):
+
+        assert False
+
+    @pytest.mark.xfail
+    def it_goes_to_change_email_with_correct_email_filled_in(
+            self, live_server, browser):
+        assert False
