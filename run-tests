@@ -69,7 +69,11 @@ def run_on_updates():
     import pytest_watch
 
     def runner(args):
-        return pytest_watch.command.main(['--'] + args)
+        watch_args = [
+            '--ignore', 'venv',
+            '--'
+        ]
+        return pytest_watch.command.main(watch_args + args)
 
     return runner
 

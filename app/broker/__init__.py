@@ -11,5 +11,4 @@ broker = Blueprint('broker', __name__)
 @authenticate
 def auth():
     session['auth_redirect'] = authorize()
-
     return redirect(url_for('main.to_service'))

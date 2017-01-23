@@ -4,7 +4,14 @@ Handle OIDC authentication requests
 """
 import re
 
-from flask import jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for
+)
 
 from app.main import main
 from app.main.forms import (
@@ -38,7 +45,9 @@ idp_profiles = [
         'idp_name': 'co-digital',
         'name': 'Cabinet Office',
         'email_pattern': '^[^@]+@cabinetoffice\.gov\.uk$',
-        'hint': 'CO staff on the Official platform. @cabinet-office.gov.uk accounts only.'
+        'hint': (
+            'CO staff on the Official platform. @cabinet-office.gov.uk '
+            'accounts only.')
     },
     {
         'id': 'ccs',
@@ -47,6 +56,14 @@ idp_profiles = [
         'email_pattern': '^[^@]+@crowncommercial\.gov\.uk$',
         'hint': 'CCS staff, @crowncommercial.gov.uk accounts'
     },
+    # csc.gov.uk
+    # csep.gov.uk
+    # cslearning.gov.uk
+    # dexeu.gov.uk
+    # ipa.gov.uk
+    # odandd.gov.uk
+    # orcl.gov.uk
+    # pco.gov.uk
     {
         'id': 'ad-saml',
         'idp_name': 'ad-saml',
@@ -181,6 +198,7 @@ def select_dept():
                          for d in idp_profiles]
 
     if form.validate_on_submit():
+
         if form.dept.data:
             session['suggested_idp'] = form.dept.data
             return redirect(url_for('.to_idp'))
@@ -192,7 +210,7 @@ def select_dept():
 
 @main.route('/search-dept')
 def search_dept():
-    search_term = request.args.get('search_term', 0, type=str)
+    # search_term = request.args.get('search_term', 0, type=str)
     return jsonify([
         {'id': 'GDS', 'descr': 'Government Digital Services'},
         {'id': 'CO', 'descr': 'Cabinet Office'},

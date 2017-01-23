@@ -17,6 +17,8 @@ pytest-mock
 pytest-spec
 pytest-splinter
 pytest-watch
+requests
+responses
 waitress
 Werkzeug
 WTForms

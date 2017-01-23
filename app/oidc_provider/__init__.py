@@ -53,6 +53,19 @@ def init_oidc_provider(app):
                 'code',
             ],
         },
+        'test-client': {
+            'client_name': 'Test',
+            'client_secret': 'test-secret',
+            'post_logout_redirect_uris': [
+                'http://example.com/sign-out',
+            ],
+            'redirect_uris': [
+                'http://example.com/oidc_callback',
+            ],
+            'response_types': [
+                'code',
+            ],
+        },
     }
     provider = Provider(signing_key, config, authz_state, clients, userinfo_db)
     return provider

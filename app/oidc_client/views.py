@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from flask import current_app, redirect, request, session
 from oic.oauth2.exception import MissingEndpoint
 from oic.oic.message import AuthorizationResponse
