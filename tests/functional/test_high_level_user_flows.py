@@ -77,7 +77,8 @@ class When_first_visiting_confirm_department(object):
 
 class When_on_confirm_department_clicking_no(object):
 
-    def it_goes_to_confirm_email_when_continue_clicked(self, live_server, browser):
+    def it_goes_to_confirm_email_when_continue_clicked(
+            self, live_server, browser):
         browser.visit(url_for('main.confirm_dept', _external=True))
 
         browser.choose('confirm', 'no')
