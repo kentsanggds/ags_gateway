@@ -58,9 +58,11 @@ def init_oidc_provider(app):
             'client_secret': 'test-secret',
             'post_logout_redirect_uris': [
                 'http://example.com/sign-out',
+                'https://sue-my-brother.cloudapps.digital/sign-out',
             ],
             'redirect_uris': [
                 'http://example.com/oidc_callback',
+                'https://sue-my-brother.cloudapps.digital/oidc_callback',
             ],
             'response_types': [
                 'code',
