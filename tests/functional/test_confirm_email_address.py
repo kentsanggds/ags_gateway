@@ -1,21 +1,18 @@
-import pytest
 from flask import url_for
-
-email_depts = [('some.one@digital.cabinet-office.gov.uk',
-                'Government Digital Service')]
+from tests.functional.user_flows import on_email_confirm_fill_in_then_continue
+from tests.functional.user_flows import yes_selected, no_selected
 
 
 class When_on_confirm_email_with_yes_selected_and_valid_email(object):
 
-    @pytest.mark.parametrize("email_address,department", email_depts)
     def it_goes_to_department_confirm_when_continue_clicked(
-            self, live_server, browser, email_address, department):
-        browser.visit(url_for('main.request_email_address', _external=True))
+            self, live_server, browser):
 
-        browser.choose('email_known', 'yes')
-        browser.fill('email_address', email_address)
+        email_address = 'some.one@digital.cabinet-office.gov.uk'
+        department = 'Government Digital Service'
 
-        browser.find_by_css('form button').click()
+        on_email_confirm_fill_in_then_continue(
+            browser, yes_selected, email_address)
 
         assert browser.url == url_for('main.confirm_dept', _external=True)
         assert browser.find_by_css(
@@ -28,10 +25,9 @@ class When_on_confirm_email_with_no_selected(object):
 
     def it_goes_to_select_department_when_continue_clicked(
             self, live_server, browser):
-        browser.visit(url_for('main.request_email_address', _external=True))
 
-        browser.choose('email_known', 'no')
-        browser.find_by_css('form button').click()
+        on_email_confirm_fill_in_then_continue(
+            browser, no_selected)
 
         assert browser.url == url_for('main.select_dept', _external=True)
 
@@ -52,8 +48,7 @@ class When_first_visiting_confirm_email(object):
     def it_does_not_go_to_department_confirm_when_continue_clicked(
             self, live_server, browser):
 
-        browser.visit(url_for('main.request_email_address', _external=True))
-        browser.find_by_css('form button').click()
+        on_email_confirm_fill_in_then_continue(browser)
 
         assert browser.url == url_for(
             'main.request_email_address', _external=True)
