@@ -86,7 +86,7 @@ Contributing
 Copyright
 ---------
 
-Copyright |copy| 2015 HM Government (Government Digital Service). See
+Copyright |copy| 2017 HM Government (Government Digital Service). See
 LICENSE for further details.
 
 .. |copy| unicode:: 0xA9 .. copyright symbol
