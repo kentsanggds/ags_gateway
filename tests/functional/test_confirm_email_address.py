@@ -16,9 +16,8 @@ class When_on_confirm_email_with_yes_selected_and_valid_email(object):
 
         assert browser.url == url_for('main.confirm_dept', _external=True)
         assert browser.find_by_css(
-            '#confirm-dept > div > div').value == email_address
-        assert department in browser.find_by_css(
-            '#confirm-dept > h2').value
+            '#confirm-dept>div>div').value == email_address
+        assert department in browser.find_by_css('#confirm-dept > h2').value
 
 
 class When_on_confirm_email_with_no_selected(object):
@@ -26,8 +25,7 @@ class When_on_confirm_email_with_no_selected(object):
     def it_goes_to_select_department_when_continue_clicked(
             self, live_server, browser):
 
-        on_email_confirm_fill_in_then_continue(
-            browser, no_selected)
+        on_email_confirm_fill_in_then_continue(browser, no_selected)
 
         assert browser.url == url_for('main.select_dept', _external=True)
 
