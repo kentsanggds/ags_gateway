@@ -30,7 +30,11 @@ def set_email_address(browser):
 
 @pytest.fixture
 def submit_known_email_address(
+<<<<<<< HEAD
         browser, set_email_known, set_email_address):
+=======
+        browser, email_address, set_email_known, set_email_address):
+>>>>>>> Refactor to use user flow functions
     def do_submit_known_email_address(email_address):
         browser.visit(url_for('main.request_email_address', _external=True))
         set_email_known(True)
