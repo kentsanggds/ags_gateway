@@ -37,3 +37,10 @@ def submit_known_email_address(
         set_email_address(email_address)
         browser.find_by_css('form button').click()
     return do_submit_known_email_address
+
+
+@pytest.fixture
+def click_change_email_link_on_dept_confirm(browser):
+    def do_click_change_email_link_on_dept_confirm():
+        browser.find_by_css('#confirm-dept a').click()
+    return do_click_change_email_link_on_dept_confirm
