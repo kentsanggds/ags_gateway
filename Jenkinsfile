@@ -62,6 +62,14 @@ node {
                 def url = "https://${app_name}.cloudapps.digital"
                 slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
             }
+
+            build(
+                job: 'sue_my_brother/master',
+                parameters: [
+                    string(name: 'OIDC_CLIENT_ISSUER', value: url),
+                    string(name: 'GATEWAY_BRANCH', value: branch)
+                ]
+            )
         }
 
     }
