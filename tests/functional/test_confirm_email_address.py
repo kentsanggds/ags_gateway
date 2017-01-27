@@ -3,17 +3,17 @@ from flask import url_for
 
 
 @pytest.mark.usefixtures('live_server')
-class When_on_confirm_email_with_yes_selected_and_valid_email(object):
+class When_on_confirm_email_with_yes_selected(object):
 
     @pytest.fixture(autouse=True)
-    def setup_page(
-            self, browser, email_address, set_email_known, set_email_address):
+    def setup_page(self, browser, set_email_known):
         browser.visit(url_for('main.request_email_address', _external=True))
         set_email_known(True)
-        set_email_address(email_address)
 
-    def it_goes_to_department_confirm_when_continue_clicked(
-            self, browser, email_address, department):
+    def it_goes_to_department_confirm_when_valid_email_submitted(
+            self, browser, email_address, department, set_email_address):
+
+        set_email_address(email_address)
 
         browser.find_by_css('form button').click()
 
@@ -22,12 +22,20 @@ class When_on_confirm_email_with_yes_selected_and_valid_email(object):
             '#confirm-dept>div>div').value == email_address
         assert department in browser.find_by_css('#confirm-dept > h2').value
 
+    def it_shows_an_error_if_no_email_address_submitted(self, browser):
+
+        browser.find_by_css('form button').click()
+
+        assert browser.url == url_for(
+            'main.request_email_address', _external=True)
+        assert browser.find_by_css('label[for=email_address] .error-message')
+
 
 @pytest.mark.usefixtures('live_server')
 class When_on_confirm_email_with_no_selected(object):
 
     @pytest.fixture(autouse=True)
-    def setup_page(self, browser, email_address, set_email_known):
+    def setup_page(self, browser, set_email_known):
         browser.visit(url_for('main.request_email_address', _external=True))
         set_email_known(False)
 
