@@ -45,21 +45,25 @@ node {
 
     }
 
-    stage("Deploy") {
-        def app_name = "ags-gateway"
+    if (!BRANCH_NAME.startsWith('PR-')) {
 
-        if (BRANCH_NAME != 'master') {
-            app_name = "${app_name}-${BRANCH_NAME.replace('_', '-')}"
+        stage("Deploy") {
+            def app_name = "ags-gateway"
+
+            if (BRANCH_NAME != 'master') {
+                app_name = "${app_name}-${BRANCH_NAME.replace('_', '-')}"
+            }
+
+            retry(2) {
+                deployToPaaS(app_name)
+            }
+
+            if (BRANCH_NAME == 'master') {
+                def url = "https://${app_name}.cloudapps.digital"
+                slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
+            }
         }
 
-        retry(2) {
-            deployToPaaS(app_name)
-        }
-
-        if (BRANCH_NAME == 'master') {
-            def url = "https://${app_name}.cloudapps.digital"
-            slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
-        }
     }
 }
 
