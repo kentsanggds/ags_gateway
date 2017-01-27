@@ -31,18 +31,19 @@ node {
 
     stage("Test") {
 
-        stage("Unit tests") {
-            runTests('unit')
-        }
+        parallel (
+            "Unit tests": {
+                runTests('unit')
+            },
 
-        stage("Integration tests") {
-            runTests('integration')
-        }
+            "Integration tests": {
+                runTests('integration')
+            },
 
-        stage("Functional tests") {
-            runTests('functional')
-        }
-
+            "Functional tests": {
+                runTests('functional')
+            }
+        )
     }
 
     if (!BRANCH_NAME.startsWith('PR-')) {
