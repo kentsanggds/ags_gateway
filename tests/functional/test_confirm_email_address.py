@@ -46,11 +46,11 @@ class When_first_visiting_confirm_email(object):
         browser.visit(url_for('main.request_email_address', _external=True))
 
     def it_does_not_show_email_textbox(self, browser):
-        assert not browser.find_by_name('email_address').visible
+        assert browser.find_by_name('email_address').visible is False
 
     def it_does_not_select_any_radio_buttons(self, browser):
-        assert not browser.find_by_css('#email_known-0').checked
-        assert not browser.find_by_css('#email_known-1').checked
+        assert browser.find_by_css('#email_known-0').checked is False
+        assert browser.find_by_css('#email_known-1').checked is False
 
     def it_stays_on_email_confirm_when_continue_clicked(self, browser):
         browser.find_by_css('form button').click()
