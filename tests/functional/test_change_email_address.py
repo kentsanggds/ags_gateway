@@ -8,11 +8,11 @@ class When_on_change_email_address_page(object):
     @pytest.fixture(autouse=True)
     def setup_page(
             self,
+            browser,
             email_address,
-            submit_known_email_address,
-            click_change_email):
+            submit_known_email_address):
         submit_known_email_address(email_address)
-        click_change_email()
+        browser.find_by_css('#change_email').click()
 
     def it_shows_the_email_address_supplied_in_the_textbox(
             self, browser, email_address):

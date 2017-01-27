@@ -37,10 +37,3 @@ def submit_known_email_address(
         set_email_address(email_address)
         browser.find_by_css('form button').click()
     return do_submit_known_email_address
-
-
-@pytest.fixture
-def click_change_email(browser):
-    def do_click_change_email():
-        browser.find_by_css('#change_email').click()
-    return do_click_change_email
