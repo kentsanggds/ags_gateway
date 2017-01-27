@@ -22,11 +22,11 @@ class When_first_visiting_confirm_department(object):
 class When_on_confirm_department_clicking_no(object):
 
     @pytest.fixture(autouse=True)
-    def setup_page(self, email_address, submit_known_email_address):
+    def setup_page(self, browser, email_address, submit_known_email_address):
         submit_known_email_address(email_address)
+        browser.choose('confirm', 'no')
 
     def it_goes_to_confirm_email_when_continue_clicked(self, browser):
-        browser.choose('confirm', 'no')
         browser.find_by_css('form button').click()
 
         assert browser.url == url_for(

@@ -10,9 +10,9 @@ class When_on_change_email_address_page(object):
             self,
             email_address,
             submit_known_email_address,
-            click_change_email_link_on_dept_confirm):
+            click_change_email):
         submit_known_email_address(email_address)
-        click_change_email_link_on_dept_confirm()
+        click_change_email()
 
     def it_shows_the_email_address_supplied_in_the_textbox(
             self, browser, email_address):
