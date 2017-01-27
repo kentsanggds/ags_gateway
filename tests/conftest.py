@@ -1,4 +1,5 @@
 import pytest
+
 from responses import RequestsMock
 
 from app.factory import create_app
