@@ -42,13 +42,16 @@ class RequiredIf(InputRequired):
 
 class EmailForm(FlaskForm):
     email_known = RadioField(choices=yesno)
-    email_address = EmailField('Email', validators=[
-        RequiredIf(
-            'email_known',
-            value=YES,
-            message='You must enter a valid email address'),
-        Email(),
-    ])
+    email_address = EmailField(
+        'Email',
+        validators=[
+            RequiredIf(
+                'email_known',
+                value=YES,
+                message='You must enter a valid email address'),
+            Email(),
+        ]
+    )
 
 
 class IdpConfirmForm(FlaskForm):
