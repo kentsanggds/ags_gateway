@@ -10,11 +10,11 @@ class When_on_to_idp_interstitial(object):
     @pytest.fixture(autouse=True)
     def setup_page(
             self,
+            browser,
             email_address,
-            submit_known_email_address,
-            click_continue_button):
+            submit_known_email_address):
         submit_known_email_address(email_address)
-        click_continue_button()
+        browser.find_by_css('form button').click()
 
     def it_goes_to_the_idp_after_clicking_continue(
             self, browser, config, responses):
