@@ -49,23 +49,43 @@ node {
     if (!BRANCH_NAME.startsWith('PR-')) {
 
         stage("Deploy") {
-            def app_name = "ags-gateway"
+            def branch = "${BRANCH_NAME.replace('_', '-')}"
+            def appName = cfAppName("ags-gateway", branch)
+            def url = "https://${appName}.cloudapps.digital"
 
-            if (BRANCH_NAME != 'master') {
-                app_name = "${app_name}-${BRANCH_NAME.replace('_', '-')}"
-            }
+            parallel (
 
-            retry(2) {
-                deployToPaaS(app_name)
-            }
+                "Deploy to PaaS": {
+                    deployToPaaS(appName)
 
-            if (BRANCH_NAME == 'master') {
-                def url = "https://${app_name}.cloudapps.digital"
-                slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
-            }
+                    if (BRANCH_NAME == 'master') {
+                        slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
+                    }
+                },
+
+                "Deploy test client": {
+                    build(
+                        job: 'sue_my_brother/master',
+                        parameters: [
+                            string(name: 'OIDC_CLIENT_ISSUER', value: url),
+                            string(name: 'GATEWAY_BRANCH', value: branch)
+                        ]
+                    )
+                }
+            )
         }
 
     }
+}
+
+
+def cfAppName(appName, branch) {
+
+    if (branch != 'master') {
+        appName = "${appName}-${branch}"
+    }
+
+    return appName
 }
 
 
@@ -95,12 +115,11 @@ def runTests(path) {
 
 
 def deployToPaaS(app_name) {
-    def paasUser ='f8b4788a-0383-4c2a-ba4f-64415628debb'
 
     withEnv(["CF_APPNAME=${app_name}"]) {
         withCredentials([
             usernamePassword(
-                credentialsId: paasUser,
+                credentialsId: 'paas-deploy',
                 usernameVariable: 'CF_USER',
                 passwordVariable: 'CF_PASSWORD'),
             file(
