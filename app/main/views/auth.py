@@ -88,8 +88,11 @@ def match_idp_email(idp, email_address):
     return re.match(idp['email_pattern'], email_address)
 
 
-def dept_from_idp_id(id):
-    return [idp['name'] for idp in idp_profiles if id == idp['id']]
+def dept_from_idp_name(idp_name):
+    idp = [idp['name'] for idp in idp_profiles if idp_name == idp['idp_name']]
+    if idp:
+        return ' or '.join(idp)
+    return None
 
 
 def idp_for_dept(dept):
@@ -136,9 +139,10 @@ def authentication_request():
         session['suggested_idp'] = request.args['suggested_idp']
         return redirect(url_for('.confirm_idp'))
 
-    elif (request.cookies.get('gateway_idp')):
+    elif request.cookies.get('gateway_idp'):
         session['suggested_idp'] = request.cookies.get('gateway_idp')
-        session['department_name'] = dept_from_idp_id(session['suggested_idp'])
+        session['department_name'] = dept_from_idp_name(
+            session['suggested_idp'])
         return redirect(url_for('.confirm_dept'))
 
     return redirect(url_for('.request_email_address'))

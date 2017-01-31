@@ -3,36 +3,41 @@ from flask import url_for
 import pytest
 
 
-def req(url, method, **kwargs):
+cookie_name = 'gateway_idp'
+cookie_value = 'gds-google'
+department = "Government Digital Service"
+
+
+def request(url, method, **kwargs):
     r = method(url, **kwargs)
     r.soup = BeautifulSoup(r.get_data(as_text=True), 'html.parser')
     return r
 
 
-cookie = {'name': 'gateway_idp', 'value': 'gds-google'}
-department = "Government Digital Service"
+class WhenOnToIDPInterstitialWithSuggestedIDPSessionSet(object):
 
+    @pytest.fixture(autouse=True)
+    def setup_page(self, client):
+        with client.session_transaction() as session:
+            session['suggested_idp'] = cookie_value
+        self.response = request(url_for('main.to_idp'),
+                                client.get, follow_redirects=True)
 
-class WhenOnToIDPInterstitial(object):
-
-    @pytest.mark.xfail
-    def it_sets_Gateway_IDP_cookie_to_suggested_IDP_session(self):
-        assert False
+    def it_stores_suggested_IDP_in_Gateway_IDP_cookie(self):
+        cookie = self.response.headers['Set-Cookie']
+        assert "{}={};".format(cookie_name, cookie_value) in cookie
 
 
 class WhenNavigatingToAuthPathWithGatewayIDPCookieSet(object):
 
     @pytest.fixture(autouse=True)
     def setup_page(self, client):
-        client.set_cookie('localhost', cookie.get('name'), cookie.get('value'))
-        self.response = req(url_for('main.authentication_request'),
-                            client.get, follow_redirects=True)
+        client.set_cookie('localhost', cookie_name, cookie_value)
+        self.response = request(url_for('main.authentication_request'),
+                                client.get, follow_redirects=True)
 
-    def it_redirects_to_department_confirmation_with_department_set(
-            self, client):
-
+    def it_redirects_to_department_confirmation_with_department_set(self):
         assert department in self.response.soup.select_one("form legend").text
 
-    def it_does_not_show_email_box(self):
-
+    def it_redirects_to_dept_confirm_and_does_not_show_email_given_box(self):
         assert self.response.soup.select_one(".email-given") is None
