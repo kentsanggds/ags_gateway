@@ -141,8 +141,8 @@ def authentication_request():
 
     elif request.cookies.get('gateway_idp'):
         session['suggested_idp'] = request.cookies.get('gateway_idp')
-        session['department_name'] = dept_from_idp_name(
-            session['suggested_idp'])
+        department = dept_from_idp_name(session['suggested_idp'])
+        session['department_name'] = department
         return redirect(url_for('.confirm_dept'))
 
     return redirect(url_for('.request_email_address'))
