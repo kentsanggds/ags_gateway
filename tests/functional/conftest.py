@@ -2,7 +2,7 @@ import pytest
 
 from flask import url_for
 
-from tests.conftest import responses, config
+from tests.conftest import responses, config  # noqa: F401
 from tests.oidc_testbed import MockOIDCProvider
 from tests.functional.mock_server import get_free_port, start_mock_server
 
@@ -24,7 +24,7 @@ def mock_oidc_issuer():
     return 'http://localhost:{port}/broker'.format(port=mock_server_port)
 
 
-@pytest.yield_fixture
+@pytest.yield_fixture   # noqa: F811
 def provider(responses, mock_oidc_issuer):
     global config
     config['issuer'] = mock_oidc_issuer
