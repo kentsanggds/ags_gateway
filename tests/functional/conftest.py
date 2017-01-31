@@ -2,6 +2,10 @@ import pytest
 
 from flask import url_for
 
+from tests.conftest import responses, config
+from tests.oidc_testbed import MockOIDCProvider
+from tests.functional.mock_server import get_free_port, start_mock_server
+
 
 @pytest.fixture
 def email_address():
@@ -11,6 +15,24 @@ def email_address():
 @pytest.fixture
 def department():
     return 'Government Digital Service'
+
+
+@pytest.fixture
+def mock_oidc_issuer():
+    mock_server_port = get_free_port()
+    start_mock_server(mock_server_port)
+    return 'http://localhost:{port}/broker'.format(port=mock_server_port)
+
+
+@pytest.yield_fixture
+def provider(responses, mock_oidc_issuer):
+    global config
+    config['issuer'] = mock_oidc_issuer
+
+    op = MockOIDCProvider(responses, config)
+    op.init_endpoints()
+    yield op
+    op.remove_endpoints()
 
 
 @pytest.fixture
