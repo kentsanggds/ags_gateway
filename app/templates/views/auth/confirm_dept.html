@@ -7,11 +7,13 @@
 <div id="confirm-dept">
   <h1 class="heading-large text">Confirm the department that you work for</h1>
 
+  {% if session["email_address"] %}
   <div class="text email-callout">
     <p>Email address you provided</p>
     <div class="email-given">{{ session["email_address"] }}</div>
     <p><a id="change_email" href="{{ url_for('main.change_email_address', email_address=session["email_address"]) }}">Change email</a></p>
   </div>
+  {% endif %}
 
   <h2 class="heading-medium">Do you work for the {{ session["department_name"] }}?</h2>
 
