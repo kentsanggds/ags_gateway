@@ -6,6 +6,7 @@ import re
 
 from flask import (
     jsonify,
+    make_response,
     redirect,
     render_template,
     request,
@@ -87,6 +88,13 @@ def match_idp_email(idp, email_address):
     return re.match(idp['email_pattern'], email_address)
 
 
+def dept_from_idp_name(idp_name):
+    idp = [idp['name'] for idp in idp_profiles if idp_name == idp['idp_name']]
+    if idp:
+        return ' or '.join(idp)
+    return None
+
+
 def idp_for_dept(dept):
     idp = session['auth_req'].get('dept_idp', '')
     if ',' in idp:
@@ -130,6 +138,12 @@ def authentication_request():
     elif 'suggested_idp' in request.args:
         session['suggested_idp'] = request.args['suggested_idp']
         return redirect(url_for('.confirm_idp'))
+
+    elif request.cookies.get('gateway_idp'):
+        session['suggested_idp'] = request.cookies.get('gateway_idp')
+        department = dept_from_idp_name(session['suggested_idp'])
+        session['department_name'] = department
+        return redirect(url_for('.confirm_dept'))
 
     return redirect(url_for('.request_email_address'))
 
@@ -233,7 +247,9 @@ def confirm_dept():
 
 @main.route('/to-idp')
 def to_idp():
-    return render_template('views/auth/to_idp.html')
+    resp = make_response(render_template('views/auth/to_idp.html'))
+    resp.set_cookie('gateway_idp', session['suggested_idp'])
+    return resp
 
 
 @main.route('/to-service')
