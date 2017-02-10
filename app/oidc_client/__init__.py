@@ -15,14 +15,18 @@ class OIDCClient(object):
     def init_app(self, app):
         self._app = app
 
+        print('init:')
+
         if not app.extensions:
             app.extensions = {}
 
         app.extensions['oidc_client'] = self
 
         config = app.config.get('OIDC_CLIENT', {})
+        verify_ssl = app.config.get('VERIFY_SSL', True)
 
-        client = Client(client_authn_method=CLIENT_AUTHN_METHOD)
+        client = Client(
+            client_authn_method=CLIENT_AUTHN_METHOD, verify_ssl=verify_ssl)
         client.provider_config(config['issuer'])
 
         config['redirect_uris'] = [self._init_redirect_uri(app)]

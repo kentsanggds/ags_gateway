@@ -29,6 +29,8 @@ OIDC_PROVIDER = {
 
 PREFERRED_URL_SCHEME = 'https'
 
+VERIFY_SSL = True
+
 # XXX This should be True when served over HTTPS
 OIDC_COOKIE_SECURE = False
 
@@ -86,6 +88,7 @@ LOGGING = {
     },
 }
 
+WTF_CSRF_ENABLED = True
 
 # TODO this should be True when served via HTTPS
 SESSION_COOKIE_SECURE = False
