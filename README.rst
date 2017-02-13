@@ -4,7 +4,7 @@ Accessing GaaP Services Gateway Service
 .. image:: https://travis-ci.org/crossgovernmentservices/ags_gateway.svg?branch=master
   :alt: Test result
 
-Web service and OIDC Broker which provides an Identity Provider selection user
+Web service which provides an Identity Provider selection user
 interface for Accessing GaaP Services.
 
 
@@ -33,18 +33,7 @@ Configuration
 -------------
 
 The gateway service looks for certain environment variables for settings. The
-following variables are **REQUIRED**:
-
-``OIDC_CLIENT_ISSUER``
-    The base URL of the OIDC broker
-
-``OIDC_CLIENT_ID``
-    The client ID that you have been issued
-
-``OIDC_CLIENT_SECRET``
-    The client secret that you have been issued
-
-The following variables are **OPTIONAL**:
+following variables are **OPTIONAL**:
 
 ``PORT``
     The port number the gateway app will listen on - defaults to ``5000``

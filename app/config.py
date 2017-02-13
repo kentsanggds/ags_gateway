@@ -15,26 +15,7 @@ DEBUG = bool(env.get('DEBUG', True))
 SERVER_NAME = env.get(
     'SERVER_NAME', 'localhost:{}'.format(env.get('PORT', 5000)))
 
-OIDC_CLIENT = {
-    'issuer': env.get('OIDC_CLIENT_ISSUER'),
-    'client_id': env.get('OIDC_CLIENT_ID'),
-    'client_secret': env.get('OIDC_CLIENT_SECRET'),
-}
-
-OIDC_PROVIDER = {
-    'issuer': env.get(
-        'OIDC_PROVIDER_ISSUER', 'https://{}'.format(SERVER_NAME)),
-    'subject_id_hash_salt': env.get('SUBJECT_ID_HASH_SALT', 'salt'),
-}
-
 PREFERRED_URL_SCHEME = 'https'
-
-VERIFY_SSL = True
-
-# XXX This should be True when served over HTTPS
-OIDC_COOKIE_SECURE = False
-
-OIDC_GOOGLE_APPS_DOMAIN = env.get('OIDC_GOOGLE_APPS_DOMAIN')
 
 SECRET_KEY = env.get(
     'SECRET_KEY',
@@ -42,6 +23,8 @@ SECRET_KEY = env.get(
 
 # Delay in seconds before redirecting via meta-refresh
 META_REFRESH_DELAY = int(env.get('META_REFRESH_DELAY', 7))
+
+IDP_BROKER_URL = 'https://gateway.civilservice.digital/idp-auth'
 
 # XXX Don't change the following settings unless necessary
 

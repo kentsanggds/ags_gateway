@@ -78,7 +78,6 @@ node {
                     build(
                         job: 'sue_my_brother/master',
                         parameters: [
-                            string(name: 'OIDC_CLIENT_ISSUER', value: url),
                             string(name: 'GATEWAY_BRANCH', value: branch)
                         ]
                     )

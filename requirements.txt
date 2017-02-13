@@ -5,9 +5,7 @@ Flask-WTF
 gunicorn
 libsass
 mock
-oic
 pyjwkest
-pyop
 pytest
 pytest-cov
 pytest-eradicate
