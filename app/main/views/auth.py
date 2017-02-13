@@ -3,6 +3,7 @@
 Handle OIDC authentication requests
 """
 import re
+from urllib.parse import urlparse
 
 from flask import (
     jsonify,
@@ -140,6 +141,12 @@ def authentication_request():
 
     session['auth_req'] = request.args
 
+    query = urlparse(request.url).query
+
+    if query:
+        session['px_q'] = query
+        session['px_url'] = request.args.get('px')
+
     if 'specific_idp' in request.args:
         return redirect_to_broker(request.args['specific_idp'])
 
@@ -255,6 +262,10 @@ def confirm_dept():
 
 @main.route('/to-idp')
 def to_idp():
+    if session.get('px_q'):
+        session['px_q'] = "{}&kc_idp_hint={}".format(
+            session['px_q'], session['suggested_idp'])
+
     resp = make_response(render_template('views/auth/to_idp.html'))
     resp.set_cookie('gateway_idp', session['suggested_idp'])
     return resp

@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, redirect, session, url_for
+from flask import Blueprint, current_app, redirect, session, url_for, request
 
 
 broker = Blueprint('broker', __name__)
@@ -6,4 +6,4 @@ broker = Blueprint('broker', __name__)
 
 @broker.route('/broker')
 def auth():
-    return redirect('https://gateway.civilservice.digital/idp-auth{}'.format(session['kc_q']))
+    return redirect('{}?{}'.format(session['px_url'], session['px_q']))
