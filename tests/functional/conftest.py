@@ -2,8 +2,6 @@ import pytest
 
 from flask import url_for
 
-from tests.conftest import responses, config  # noqa: F401
-from tests.oidc_testbed import MockOIDCProvider
 from tests.functional.mock_server import get_free_port, start_mock_server
 
 
@@ -17,22 +15,14 @@ def department():
     return 'Government Digital Service'
 
 
-@pytest.fixture
-def mock_oidc_issuer():
+@pytest.yield_fixture
+def issuer():
     mock_server_port = get_free_port()
-    start_mock_server(mock_server_port)
-    return 'http://localhost:{port}/broker'.format(port=mock_server_port)
+    mock_server = start_mock_server(mock_server_port)
 
+    yield 'http://localhost:{port}/broker'.format(port=mock_server_port)
 
-@pytest.yield_fixture   # noqa: F811
-def provider(responses, mock_oidc_issuer):
-    global config
-    config['issuer'] = mock_oidc_issuer
-
-    op = MockOIDCProvider(responses, config)
-    op.init_endpoints()
-    yield op
-    op.remove_endpoints()
+    mock_server.server_close()
 
 
 @pytest.fixture
