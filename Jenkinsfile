@@ -56,7 +56,18 @@ node {
             parallel (
 
                 "Deploy to PaaS": {
-                    deployToPaaS(appName)
+
+                    stash(
+                        name: "app",
+                        includes: ".cfignore,Procfile,app/**,deploy-to-paas,lib/**,*.yml,*.txt,*.pem"
+                    )
+
+                    node('master') {
+
+                        unstash "app"
+
+                        deployToPaaS(appName)
+                    }
 
                     if (BRANCH_NAME == 'master') {
                         slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
