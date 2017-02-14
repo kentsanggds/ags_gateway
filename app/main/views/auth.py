@@ -85,8 +85,14 @@ idp_profiles = [
 
 
 def redirect_to_broker(idp):
-    session['idp_hint'] = idp
     return redirect(url_for('broker.auth', idp_hint=idp))
+
+
+def set_idp_hint():
+    px_q = session.get('px_q')
+    if px_q:
+        session['px_q'] = "{}&kc_idp_hint={}".format(
+            px_q, session['suggested_idp'])
 
 
 def idp_from_email_address(email_address):
@@ -146,6 +152,8 @@ def authentication_request():
     if query:
         session['px_q'] = query
         session['px_url'] = request.args.get('px')
+
+    print('query:{}'.format(query))
 
     if 'specific_idp' in request.args:
         return redirect_to_broker(request.args['specific_idp'])
@@ -262,9 +270,7 @@ def confirm_dept():
 
 @main.route('/to-idp')
 def to_idp():
-    if session.get('px_q'):
-        session['px_q'] = "{}&kc_idp_hint={}".format(
-            session['px_q'], session['suggested_idp'])
+    set_idp_hint()
 
     resp = make_response(render_template('views/auth/to_idp.html'))
     resp.set_cookie('gateway_idp', session['suggested_idp'])

@@ -8,7 +8,7 @@ import requests
 
 
 class MockServerRequestHandler(BaseHTTPRequestHandler):
-    BROKER_PATTERN = re.compile(r'/broker')
+    BROKER_PATTERN = re.compile(r'/proxy')
 
     def do_GET(self):
         if re.search(self.BROKER_PATTERN, self.path):

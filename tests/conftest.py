@@ -16,7 +16,8 @@ def app():
     app = create_app(**{
         'TESTING': True,
         'PREFERRED_URL_SCHEME': 'http',
-        'WTF_CSRF_ENABLED': False
+        'WTF_CSRF_ENABLED': False,
+        'META_REFRESH_DELAY': 1,
     })
 
     ctx = app.app_context()
