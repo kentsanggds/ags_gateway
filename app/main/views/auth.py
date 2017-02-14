@@ -57,6 +57,14 @@ idp_profiles = [
         'email_pattern': '^[^@]+@crowncommercial\.gov\.uk$',
         'hint': 'CCS staff, @crowncommercial.gov.uk accounts'
     },
+    {
+        'id': 'HOD',
+        'idp_name': 'HOD',
+        'name': 'Home Office Digital',
+        'email_pattern': '^[^@]+@digital\.homeoffice\.gov\.uk$',
+        'hint': (
+            'Home Office Digital staff, @digital.homeoffice.gov.uk accounts.')
+    },
     # csc.gov.uk
     # csep.gov.uk
     # cslearning.gov.uk
