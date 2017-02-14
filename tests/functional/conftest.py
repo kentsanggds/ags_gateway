@@ -2,6 +2,8 @@ import pytest
 
 from flask import url_for
 
+from tests.functional.mock_server import get_free_port, start_mock_server
+
 
 @pytest.fixture
 def email_address():
@@ -11,6 +13,16 @@ def email_address():
 @pytest.fixture
 def department():
     return 'Government Digital Service'
+
+
+@pytest.yield_fixture
+def issuer():
+    mock_server_port = get_free_port()
+    mock_server = start_mock_server(mock_server_port)
+
+    yield 'http://localhost:{port}/broker'.format(port=mock_server_port)
+
+    mock_server.server_close()
 
 
 @pytest.fixture
