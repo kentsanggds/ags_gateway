@@ -50,12 +50,12 @@ node {
 
         stage("Deploy") {
             def branch = "${BRANCH_NAME.replace('_', '-')}"
-            def appName = cfAppName("ags-gateway", branch)
+            def appName = cfAppName("ags-gateway-proxied", branch)
             def url = "https://${appName}.cloudapps.digital"
 
             parallel (
 
-                "Deploy to PaaS": {
+                "Deploy Gateway to PaaS": {
 
                     stash(
                         name: "app",
@@ -68,23 +68,30 @@ node {
 
                         deployToPaaS(appName)
                     }
-
-                    if (BRANCH_NAME == 'master') {
-                        slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
-                    }
                 },
 
-                "Deploy test client": {
+                "Deploy proxy to PaaS": {
                     build(
-                        job: 'sue_my_brother/master',
+                        job: 'keycloak-proxy/ags',
+                        parameters: [
+                            string(name: 'GATEWAY_BRANCH', value: branch)
+                        ]
+                    )                    
+                },
+
+                "Deploy test client to PaaS": {
+                    build(
+                        job: 'sue_my_brother/kc-proxy',
                         parameters: [
                             string(name: 'GATEWAY_BRANCH', value: branch)
                         ]
                     )
                 }
             )
+            if (BRANCH_NAME == 'master') {
+                slackSend color: success, message: "Deployed ${BRANCH_NAME} branch of Gateway to ${url}"
+            }
         }
-
     }
 }
 
@@ -113,7 +120,7 @@ def runTests(path) {
             }
 
             if (BRANCH_NAME == 'master') {
-                slackSend(color: fail, message: "${path.capitalize()} tests failed on ${BRANCH_NAME} branch of Gateway")
+                slackSend(color: fail, message: "${path.capitalize()} tests failed on ${BRANCH_NAME} branch of Proxied Gateway")
             }
 
             throw err
